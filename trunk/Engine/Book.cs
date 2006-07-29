@@ -17,3 +17,32 @@
     along with Loominate; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 *******************************************************************************/
+
+namespace Loominate.Engine
+{
+    using System;
+    using System.Xml;
+    using System.Xml.Schema;
+    using System.Xml.Serialization;
+
+    public class Book : IXmlSerializable
+    {
+        
+        public Book()
+        {
+        }
+
+        void IXmlSerializable.ReadXml(XmlReader reader)
+        {
+        }
+
+        void IXmlSerializable.WriteXml(XmlWriter writer)
+        {
+        }
+
+        XmlSchema IXmlSerializable.GetSchema()
+        {
+            return null;
+        }
+    }
+}
