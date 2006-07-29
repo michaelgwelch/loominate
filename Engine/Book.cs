@@ -17,32 +17,3 @@
     along with Loominate; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 *******************************************************************************/
-using System;
-
-namespace Loominate.Engine
-{
-    /// <summary>
-    /// A ledger entry
-    /// </summary>
-    public class Split
-    {
-        // QofInstance inst;
-        Account acct;
-        Account orighAcct;
-        Lot lot;
-        Transaction parent;
-        Transaction origParent; //originating parent?
-        
-        
-        string memo;
-        string action;
-        DateTime dateReconciled;
-        bool reconciled;
-        
-        // unsigned char gains
-        
-        Split gainsSplit;
-        decimal value;      // the value expressed in a known commodity
-        decimal amount;     // the ammount of the commodity involved
-    }
-}
