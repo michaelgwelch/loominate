@@ -1,1 +1,5 @@
 This defines the API for double entry accounting system.
+
+Classes also know how to serialize/deserialize themselves.
+
+These classes correspond to the engine strucutres of gnucash.
