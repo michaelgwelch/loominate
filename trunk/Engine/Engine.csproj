@@ -19,7 +19,7 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>bin\Debug\</OutputPath>
     <Optimize>False</Optimize>
-    <DefineConstants>DEBUG;TRACE;NUNIT</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;TEST</DefineConstants>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>Full</DebugType>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -49,6 +49,7 @@
     <Compile Include="Test\GetRandom.cs" />
     <Compile Include="Test\TestCommodity.cs" />
     <Compile Include="Test\TestSplit.cs" />
+    <Compile Include="Test\TestCommoditySerialization.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Test" />
