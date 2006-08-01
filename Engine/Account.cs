@@ -20,12 +20,20 @@
         
 namespace Loominate.Engine
 {
+    using System;
     using System.Collections.Generic;
-    
+    using System.Xml.Serialization;
+
+    [XmlType(Namespace=Namespaces.GnuCash)]
+    [XmlRoot(Namespace=Namespaces.GnuCash, ElementName="account")]
     public class Account
     {
+        [XmlAttribute("version", Namespace=Namespaces.Account)]
+        public string Version = "2.0.0";
+
         // QofInstance inst;
         string accountName;
+        Guid id;
         string accountCode;
         string description;
         AccountType type;
@@ -56,6 +64,32 @@ namespace Loominate.Engine
         bool isSortDirty;
         
         short mark;
+
+        [XmlElement(Namespace=Namespaces.Account, ElementName="name")]
+        public string Name
+        {
+            get
+            {
+                return accountName;
+            }
+            set
+            {
+                accountName = value;
+            }
+        }
+
+        [XmlElement(DataType="guid", Namespace=Namespaces.Account, ElementName="id", Type=typeof(Guid))]
+        public Guid Id
+        {
+            get
+            {
+                return id;
+            }
+            set
+            {
+                id = value;
+            }
+        }
 
     }
 }
