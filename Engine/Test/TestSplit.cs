@@ -23,13 +23,13 @@ namespace Loominate.Engine
 {
     using System;
     using NUnit.Framework;
-	
-	public class TestSplit
-	{
-		public TestSplit()
-		{
-		}
-	}
-	
+
+    public class TestSplit
+    {
+        public TestSplit()
+        {
+        }
+    }
+
 }
 #endif

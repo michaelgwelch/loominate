@@ -23,59 +23,59 @@
 
 namespace Loominate.Engine
 {
-	using System;
-	using System.IO;
-	using System.Xml.Serialization;
-	using System.Xml;
-	using NUnit.Framework;
- 
-	[TestFixture]
-	public class TestCommoditySerialization
-	{
+    using System;
+    using System.IO;
+    using System.Xml.Serialization;
+    using System.Xml;
+    using NUnit.Framework;
 
-		[Test]
-		public void TestRead()
-		{
-			string xml = @" <cmdty:space>ISO4217</cmdty:space> 
+    [TestFixture]
+    public class TestCommoditySerialization
+    {
+
+        [Test]
+        public void TestRead()
+        {
+            string xml = @" <cmdty:space>ISO4217</cmdty:space> 
 				<cmdty:fraction>10000</cmdty:fraction> 
 				<cmdty:name>US Dollar</cmdty:name> 
 				<cmdty:id>USD</cmdty:id> 
 				<cmdty:xcode>849</cmdty:xcode>";
-			
-			XmlReader reader = CreateReader(xml, "cmdty", "http://www.gnucash.org/XML/cmdty");
 
-			XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
-			nms.Add("cmdty", "http://www.gnucash.org/XML/cmdty");
-			nms.Add("gnc", "http://www.gnucash.org/XML/gnc");
-			
-			XmlSerializer s = new XmlSerializer(typeof(Commodity));
-			
-			Commodity c = new Commodity(null, "US Dollar", "CURRENCY", "USD", "ISO$###", 100);
-			StringWriter w = new StringWriter();
+            XmlReader reader = CreateReader(xml, "cmdty", "http://www.gnucash.org/XML/cmdty");
 
-			s.Serialize(w, c, nms);
-			string str = w.ToString();
-			
-			System.Diagnostics.Debug.WriteLine(str);
-			
-			//c.ReadXml(reader);
-			Assert.AreEqual("ISO4217", c.Namespace, "check namespace");
-			Assert.AreEqual("US Dollar", c.FullName, "check name");
-			Assert.AreEqual(10000, c.Fraction, "check fraction");
-		}
-		
-		private XmlReader CreateReader(string xml, string prefix, string url)
-		{
-			
-			NameTable tbl = new NameTable();
-			XmlNamespaceManager mgr = new XmlNamespaceManager(tbl);
-			mgr.AddNamespace(prefix, url);
-			XmlParserContext context = new XmlParserContext(tbl, mgr, null, XmlSpace.Default);
+            XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
+            nms.Add("cmdty", "http://www.gnucash.org/XML/cmdty");
+            nms.Add("gnc", "http://www.gnucash.org/XML/gnc");
 
-			XmlReaderSettings settings = new XmlReaderSettings();
-			settings.ConformanceLevel = ConformanceLevel.Fragment;
-			return XmlReader.Create(new StringReader(xml), settings, context);
-		}
-	}
+            XmlSerializer s = new XmlSerializer(typeof(Commodity));
+
+            Commodity c = new Commodity(null, "US Dollar", "CURRENCY", "USD", "ISO$###", 100);
+            StringWriter w = new StringWriter();
+
+            s.Serialize(w, c, nms);
+            string str = w.ToString();
+
+            System.Diagnostics.Debug.WriteLine(str);
+
+            //c.ReadXml(reader);
+            Assert.AreEqual("ISO4217", c.Namespace, "check namespace");
+            Assert.AreEqual("US Dollar", c.FullName, "check name");
+            Assert.AreEqual(10000, c.Fraction, "check fraction");
+        }
+
+        private XmlReader CreateReader(string xml, string prefix, string url)
+        {
+
+            NameTable tbl = new NameTable();
+            XmlNamespaceManager mgr = new XmlNamespaceManager(tbl);
+            mgr.AddNamespace(prefix, url);
+            XmlParserContext context = new XmlParserContext(tbl, mgr, null, XmlSpace.Default);
+
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.ConformanceLevel = ConformanceLevel.Fragment;
+            return XmlReader.Create(new StringReader(xml), settings, context);
+        }
+    }
 }
 #endif
