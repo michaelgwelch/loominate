@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with Loominate; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *******************************************************************************/
+*******************************************************************************/
 #if TEST
 
 
@@ -36,13 +36,13 @@ namespace Loominate.Engine
         [Test]
         public void TestRead()
         {
-            string xml = @" <cmdty:space>ISO4217</cmdty:space> 
-				<cmdty:fraction>10000</cmdty:fraction> 
-				<cmdty:name>US Dollar</cmdty:name> 
-				<cmdty:id>USD</cmdty:id> 
-				<cmdty:xcode>849</cmdty:xcode>";
+//            string xml = @" <cmdty:space>ISO4217</cmdty:space> 
+//				<cmdty:fraction>10000</cmdty:fraction> 
+//				<cmdty:name>US Dollar</cmdty:name> 
+//				<cmdty:id>USD</cmdty:id> 
+//				<cmdty:xcode>849</cmdty:xcode>";
 
-            XmlReader reader = CreateReader(xml, "cmdty", "http://www.gnucash.org/XML/cmdty");
+            //XmlReader reader = XmlReaderFactory.CreateReader(xml);
 
             XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
             nms.Add("cmdty", "http://www.gnucash.org/XML/cmdty");
@@ -62,19 +62,6 @@ namespace Loominate.Engine
             Assert.AreEqual("ISO4217", c.Namespace, "check namespace");
             Assert.AreEqual("US Dollar", c.FullName, "check name");
             Assert.AreEqual(10000, c.Fraction, "check fraction");
-        }
-
-        private XmlReader CreateReader(string xml, string prefix, string url)
-        {
-
-            NameTable tbl = new NameTable();
-            XmlNamespaceManager mgr = new XmlNamespaceManager(tbl);
-            mgr.AddNamespace(prefix, url);
-            XmlParserContext context = new XmlParserContext(tbl, mgr, null, XmlSpace.Default);
-
-            XmlReaderSettings settings = new XmlReaderSettings();
-            settings.ConformanceLevel = ConformanceLevel.Fragment;
-            return XmlReader.Create(new StringReader(xml), settings, context);
         }
     }
 }

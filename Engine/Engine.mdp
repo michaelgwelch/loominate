@@ -1,5 +1,5 @@
 <Project name="Engine" fileversion="2.0" language="C#" clr-version="Net_2_0" ctype="DotNetProject">
-  <Configurations active="Debug">
+  <Configurations active="TEST">
     <Configuration name="Debug" ctype="DotNetProjectConfiguration">
       <Output directory="../bin/Debug" assembly="Engine" />
       <Build debugmode="True" target="Library" />
@@ -41,6 +41,7 @@
     <File name="./Test/TestAccountSerialization.cs" subtype="Code" buildaction="Compile" />
     <File name="./Test/TestCommoditySerialization.cs" subtype="Code" buildaction="Compile" />
     <File name="./Namespaces.cs" subtype="Code" buildaction="Compile" />
+    <File name="./Test/XmlReaderFactory.cs" subtype="Code" buildaction="Compile" />
   </Contents>
   <References>
     <ProjectReference type="Gac" localcopy="True" refto="nunit.framework, Version=2.2.0.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77" />
