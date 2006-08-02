@@ -19,39 +19,28 @@
 *******************************************************************************/
 
 using System;
-using System.Drawing;
 using System.Windows.Forms;
 
-namespace Loominate.Gooey.Controls
+namespace Gooey.Controls.Register
 {
 	/// <summary>
-	/// Description of CloseTabButton.
+	/// Description of RegisterRow.
 	/// </summary>
-	public class CloseTabButton : Button
+	public class RegisterRow : Control
 	{
-		private TabPage page;
-		
-		public CloseTabButton(TabPage page)
+	    private int i = 0;
+	    private RegisterControl register;
+	    
+	    private const int DATE_COL = 0;
+	    
+		public RegisterRow(int i, RegisterControl register)
 		{
-			this.page = page;
-
-			this.Text = "X";
-			Graphics g = Graphics.FromHwnd(this.Handle);
-			this.Width = (int) g.MeasureString(this.Text, this.Font).Width + 10;
-			
-			page.SizeChanged += new EventHandler(PageSizeChangedHandler);
-			this.Click += new EventHandler(CloseTabClickHandler);
+		    this.i = i;
+		    this.register = register;
+		    
+		    //++register.RowCount;
+		    
+		    //register.Controls.Add(new DateRegisterControl(), DATE_COL, i);
 		}
-		
-		private void CloseTabClickHandler(object sender, EventArgs e)
-		{
-			page.Parent.Controls.Remove(page);
-		}
-
-		private void PageSizeChangedHandler(object sender, EventArgs e)
-		{
-			this.Left = page.Width - this.Width;
-			this.Top = 0;
-		}		
 	}
 }

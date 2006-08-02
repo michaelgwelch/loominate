@@ -1,39 +1,56 @@
-/*
- * Created by SharpDevelop.
- * User: cedlerjo
- * Date: 7/28/2006
- * Time: 12:31 PM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
+/*******************************************************************************
+    Copyright 2006 Josh Edler
+    
+    This file is part of Loominate.
+
+    Loominate is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    Loominate is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Loominate; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*******************************************************************************/
 
 using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Gooey.Controls
+using Loominate.Gooey.Controls.Register;
+
+namespace Loominate.Gooey.Controls
 {
 	/// <summary>
 	/// Description of AccountPage.
 	/// </summary>
-	public class AccountPage : TabPage
+	public class AccountPage : GroupBox
 	{
-		public AccountPage(string name, TabControl parent)
+	    private string name;
+	    
+		public AccountPage(string name)
 		{
-			this.Name = name;
-			this.Text = name;
-			this.TabIndex = parent.Controls.Count + 1;
-			this.BackColor = Color.AliceBlue;
-			
-			Panel panel = new Panel();
-			panel.Dock = DockStyle.Fill;
-			this.Controls.Add(panel);
+		    this.name = name;
+		}
+		
+		protected override void InitLayout()
+		{
+		    SuspendLayout();
 
-			panel.Controls.Add(new CloseTabButton(this));
+		    base.InitLayout();
+		    
+			this.Text = name;
 			
-			Label hi = new Label();
-			hi.Text = "Hi!";
-			panel.Controls.Add(hi);
+			this.Dock = DockStyle.Fill;
+			
+			this.Controls.Add(new RegisterControl());
+			
+			ResumeLayout();
 		}
 	}
 }
