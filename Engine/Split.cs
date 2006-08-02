@@ -27,22 +27,22 @@ namespace Loominate.Engine
     public class Split
     {
         // QofInstance inst;
-        Account acct;
-        Account orighAcct;
-        Lot lot;
-        Transaction parent;
-        Transaction origParent; //originating parent?
-        
-        
-        string memo;
-        string action;
-        DateTime dateReconciled;
-        bool reconciled;
-        
-        // unsigned char gains
-        
-        Split gainsSplit;
-        decimal value;      // the value expressed in a known commodity
-        decimal amount;     // the ammount of the commodity involved
+//        Account acct;
+//        Account orighAcct;
+//        Lot lot;
+//        Transaction parent;
+//        Transaction origParent; //originating parent?
+//        
+//        
+//        string memo;
+//        string action;
+//        DateTime dateReconciled;
+//        bool reconciled;
+//        
+//        // unsigned char gains
+//        
+//        Split gainsSplit;
+//        decimal value;      // the value expressed in a known commodity
+//        decimal amount;     // the ammount of the commodity involved
     }
 }
