@@ -24,12 +24,12 @@ namespace Loominate.Engine
     using System.Collections.Generic;
     public class AccountGroup
     {
-        bool isSaved;
-        Account parent; // reference to parent account
-        List<Account> accounts; // list of accounts in this group
-        // Book book;
-        int editLevel; // keep track of nesting level of begin/end edit calls.
-        
+//        bool isSaved;
+//        Account parent; // reference to parent account
+//        List<Account> accounts; // list of accounts in this group
+//        // Book book;
+//        int editLevel; // keep track of nesting level of begin/end edit calls.
+//        
     }
     
 }

@@ -34,36 +34,36 @@ namespace Loominate.Engine
         // QofInstance inst;
         string accountName;
         Guid id;
-        string accountCode;
-        string description;
-        AccountType type;
-        Commodity commodity;
-        int commodityScu;
-        bool nonStandardScu;
-
-        AccountGroup parent;
-        AccountGroup children;
-
-        decimal startingBalance;
-        decimal startingClearedBalance;
-        decimal startingReconciledBalance;
-        
-        decimal balance;
-        decimal clearedBalance;
-        decimal reconciledBalance;
-        
-        int version;
-        uint versionCheck;
-        
-        List<Split> splits;
-        List<Lot> lots;
-        
-        //Policy policy;
-        
-        bool isBalanceDirty;
-        bool isSortDirty;
-        
-        short mark;
+//        string accountCode;
+//        string description;
+//        AccountType type;
+//        Commodity commodity;
+//        int commodityScu;
+//        bool nonStandardScu;
+//
+//        AccountGroup parent;
+//        AccountGroup children;
+//
+//        decimal startingBalance;
+//        decimal startingClearedBalance;
+//        decimal startingReconciledBalance;
+//        
+//        decimal balance;
+//        decimal clearedBalance;
+//        decimal reconciledBalance;
+//        
+//        int version;
+//        uint versionCheck;
+//        
+//        List<Split> splits;
+//        List<Lot> lots;
+//        
+//        //Policy policy;
+//        
+//        bool isBalanceDirty;
+//        bool isSortDirty;
+//        
+//        short mark;
 
         [XmlElement(Namespace=Namespaces.Account, ElementName="name")]
         public string Name
