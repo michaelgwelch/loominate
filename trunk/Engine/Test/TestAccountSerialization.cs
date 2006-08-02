@@ -23,12 +23,15 @@
 namespace Loominate.Engine
 {
     using System;
-    using System.Collections.Generic;
+    using System.IO;
     using System.Text;
+    using System.Xml;
+    using System.Xml.Serialization;
+    
     using NUnit.Framework;
 
     [TestFixture()]
-    class TestAccountSerialization
+    public class TestAccountSerialization
     {
         const string sampleXml="<gnc:account version=\"2.0.0\">" +
             "<act:name>Assets</act:name>" +
@@ -48,9 +51,19 @@ namespace Loominate.Engine
             "</act:slots>" +
             "</gnc:account>";
         
+        [Test]
         public void TestOne()
         {
+            XmlReader reader = XmlReaderFactory.CreateReader(sampleXml);
+            XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
+            nms.Add("cmdty", "http://www.gnucash.org/XML/cmdty");
+            nms.Add("gnc", "http://www.gnucash.org/XML/gnc");
 
+            XmlSerializer s = new XmlSerializer(typeof(Account));
+            Account a = s.Deserialize(reader) as Account;
+            
+            Assert.IsNotNull(a);
+            
         }
 
     }
