@@ -1,0 +1,17 @@
+<Combine name="MyCash" fileversion="2.0">
+  <Configurations active="TEST">
+    <Configuration name="Debug" ctype="CombineConfiguration">
+      <Entry build="True" name="Engine" configuration="Debug" />
+    </Configuration>
+    <Configuration name="Release" ctype="CombineConfiguration">
+      <Entry build="True" name="Engine" configuration="Debug" />
+    </Configuration>
+    <Configuration name="TEST" ctype="CombineConfiguration" />
+  </Configurations>
+  <StartMode startupentry="TestDecimal" single="True">
+    <Execute type="None" entry="Engine" />
+  </StartMode>
+  <Entries>
+    <Entry filename="./Engine/Engine.mdp" />
+  </Entries>
+</Combine>
