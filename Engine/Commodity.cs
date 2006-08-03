@@ -25,8 +25,8 @@ namespace Loominate.Engine
     using System.Xml.Schema;
     using System.Xml.Serialization;
 
-    [XmlType(Namespace = "http://www.gnucash.org/XML/gnc")]
-    [XmlRoot(Namespace = "http://www.gnucash.org/XML/gnc", ElementName = "commodity")]
+    [XmlType(Namespace = Namespaces.GnuCash)]
+    [XmlRoot(Namespace = Namespaces.GnuCash, ElementName = "commodity")]
     public class Commodity
     {
         private string fullName;
