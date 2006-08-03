@@ -36,32 +36,27 @@ namespace Loominate.Engine
         [Test]
         public void TestRead()
         {
-//            string xml = @" <cmdty:space>ISO4217</cmdty:space> 
-//				<cmdty:fraction>10000</cmdty:fraction> 
-//				<cmdty:name>US Dollar</cmdty:name> 
-//				<cmdty:id>USD</cmdty:id> 
-//				<cmdty:xcode>849</cmdty:xcode>";
-
-            //XmlReader reader = XmlReaderFactory.CreateReader(xml);
-
-            XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
-            nms.Add("cmdty", "http://www.gnucash.org/XML/cmdty");
-            nms.Add("gnc", "http://www.gnucash.org/XML/gnc");
-
+            string xml = @"<gnc:commodity version='2.0.0'>
+                    <cmdty:space>ISO4217</cmdty:space>
+                    <cmdty:id>USD</cmdty:id>
+                    <cmdty:name>US Dollar</cmdty:name>
+                    <cmdty:xcode>840</cmdty:xcode>
+                    <cmdty:fraction>100</cmdty:fraction>
+                    <cmdty:get_quotes/>
+                    <cmdty:quote_source>currency</cmdty:quote_source>
+                    <cmdty:quote_tz/>
+                </gnc:commodity>";
+            XmlReader reader = XmlReaderFactory.CreateReader(xml);
             XmlSerializer s = new XmlSerializer(typeof(Commodity));
+ 
+            Commodity c = (Commodity) s.Deserialize(reader);
+            
+            Assert.AreEqual("US Dollar", c.FullName);
+            Assert.AreEqual("ISO4217", c.Namespace);
+            Assert.AreEqual("USD", c.Mnemonic);
+            Assert.AreEqual("840", c.Cusip);
+            Assert.AreEqual(100, c.Fraction);
 
-            Commodity c = new Commodity(null, "US Dollar", "CURRENCY", "USD", "ISO$###", 100);
-            StringWriter w = new StringWriter();
-
-            s.Serialize(w, c, nms);
-            string str = w.ToString();
-
-            System.Diagnostics.Debug.WriteLine(str);
-
-            //c.ReadXml(reader);
-            Assert.AreEqual("ISO4217", c.Namespace, "check namespace");
-            Assert.AreEqual("US Dollar", c.FullName, "check name");
-            Assert.AreEqual(10000, c.Fraction, "check fraction");
         }
     }
 }
