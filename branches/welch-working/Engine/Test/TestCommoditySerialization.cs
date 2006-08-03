@@ -49,9 +49,14 @@ namespace Loominate.Engine
             XmlReader reader = XmlReaderFactory.CreateReader(xml);
             XmlSerializer s = new XmlSerializer(typeof(Commodity));
  
-            Commodity c = (Commodity) s.d Deserialize(new StringReader(xml), nms);
+            Commodity c = (Commodity) s.Deserialize(reader);
             
             Assert.AreEqual("US Dollar", c.FullName);
+            Assert.AreEqual("ISO4217", c.Namespace);
+            Assert.AreEqual("USD", c.Mnemonic);
+            Assert.AreEqual("840", c.Cusip);
+            Assert.AreEqual(100, c.Fraction);
+
         }
     }
 }

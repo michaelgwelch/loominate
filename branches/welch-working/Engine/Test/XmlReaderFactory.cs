@@ -25,19 +25,19 @@ namespace Loominate.Engine
     using System.IO;
     using System.Xml;
     using System.Xml.Serialization;
-    
+
     // used to create readers appropriate for specified xml fragment
     // The reader is pre-populated with appropriate namespaces.
-	public static class XmlReaderFactory
-	{
-	    internal static XmlReader CreateReader(string xml)
+    public static class XmlReaderFactory
+    {
+        internal static XmlReader CreateReader(string xml)
         {
             NameTable tbl = new NameTable();
             XmlNamespaceManager mgr = new XmlNamespaceManager(tbl);
             mgr.AddNamespace("gnc", Namespaces.GnuCash);
             mgr.AddNamespace("act", Namespaces.Account);
             mgr.AddNamespace("cmdty", Namespaces.Commodity);
-            
+
             XmlParserContext context = new XmlParserContext(tbl, mgr, null, XmlSpace.Default);
 
             XmlReaderSettings settings = new XmlReaderSettings();
@@ -45,6 +45,6 @@ namespace Loominate.Engine
             return XmlReader.Create(new StringReader(xml), settings, context);
         }
 
-	}
-	
+    }
+
 }
