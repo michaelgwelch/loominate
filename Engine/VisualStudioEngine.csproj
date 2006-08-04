@@ -25,15 +25,16 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <Optimize>True</Optimize>
-    <DefineConstants>TRACE;TEST</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;TEST</DefineConstants>
     <DebugSymbols>False</DebugSymbols>
     <DebugType>None</DebugType>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="nunit.framework" />
   </ItemGroup>
@@ -41,6 +42,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Namespaces.cs" />
     <Compile Include="Test\XmlReaderFactory.cs" />
+    <Compile Include="Test\XmlWriterFactory.cs" />
     <Compile Include="Transaction.cs" />
     <Compile Include="Account.cs" />
     <Compile Include="AccountGroup.cs" />
