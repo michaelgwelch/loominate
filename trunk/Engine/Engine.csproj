@@ -50,6 +50,9 @@
     <Compile Include="Test\TestCommodity.cs" />
     <Compile Include="Test\TestSplit.cs" />
     <Compile Include="Test\TestCommoditySerialization.cs" />
+    <Compile Include="Test\XmlWriterFactory.cs" />
+    <Compile Include="Test\XmlReaderFactory.cs" />
+    <Compile Include="Namespaces.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Test" />

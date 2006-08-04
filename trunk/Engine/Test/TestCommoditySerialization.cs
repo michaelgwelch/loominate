@@ -25,6 +25,7 @@ namespace Loominate.Engine
 {
     using System;
     using System.IO;
+    using System.Text;
     using System.Xml.Serialization;
     using System.Xml;
     using NUnit.Framework;
@@ -56,6 +57,16 @@ namespace Loominate.Engine
             Assert.AreEqual("USD", c.Mnemonic);
             Assert.AreEqual("840", c.Cusip);
             Assert.AreEqual(100, c.Fraction);
+
+            StringBuilder bldr = new StringBuilder();
+            XmlWriter writer = XmlWriterFactory.Create(bldr);
+            XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
+            nms.Add("gnc", Namespaces.GnuCash);
+            nms.Add("act", Namespaces.Account);
+            nms.Add("cmdty", Namespaces.Commodity);            
+            s.Serialize(writer, c, nms);
+            string newXml = bldr.ToString();
+            Console.WriteLine(newXml);
 
         }
     }

@@ -33,7 +33,6 @@ namespace Loominate.Engine
         private string nameSpace;
         private string mnemonic;
         private string cusip;
-        private string uniqueName;
         private int fraction;
         const string version = "2.0.0";
         const string cmdtyNs = "http://www.gnucash.org/XML/cmdty";
@@ -46,7 +45,6 @@ namespace Loominate.Engine
             this.nameSpace = nameSpace;
             this.mnemonic = mnemonic;
             this.cusip = cusip;
-            this.uniqueName = nameSpace + "::" + mnemonic;
             this.fraction = fraction;
         }
 
@@ -115,11 +113,12 @@ namespace Loominate.Engine
             }
         }
 
+        [XmlIgnore()]
         public string UniqueName
         {
             get
             {
-                return uniqueName;
+                return nameSpace + "::" + mnemonic;
             }
         }
 
@@ -147,7 +146,7 @@ namespace Loominate.Engine
 
         public override int GetHashCode()
         {
-            return uniqueName.GetHashCode();
+            return UniqueName.GetHashCode();
         }
 
         //		public void ReadXml(XmlReader reader)
