@@ -1,3 +1,4 @@
+
 /*******************************************************************************
     Copyright 2006 Michael Welch
     
@@ -63,7 +64,7 @@ namespace Loominate.Engine
             XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
             nms.Add("gnc", Namespaces.GnuCash);
             nms.Add("act", Namespaces.Account);
-            nms.Add("cmdty", Namespaces.Commodity);            
+            nms.Add("cmdty", Namespaces.Commodity);
             s.Serialize(writer, c, nms);
             string newXml = bldr.ToString();
             Console.WriteLine(newXml);

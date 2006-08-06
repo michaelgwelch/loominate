@@ -35,34 +35,46 @@ namespace Loominate.Engine
     {
         const string sampleXml="<gnc:account version=\"2.0.0\">" +
             "<act:name>Assets</act:name>" +
-            "<act:id type=\"guid\">0739c8984c8d9a604cf8784907d5232d</act:id>" +
-            "<act:type>ASSET</act:type>" +
+            "<act:id type=\"guid\">0739c8984c8d9a604cf8784907d5232d</act:id>"  + 
+            "<act:type>ASSET</act:type>" + 
             "<act:commodity>" +
                 "<cmdty:space>ISO4217</cmdty:space>" +
                 "<cmdty:id>USD</cmdty:id>" +
-            "</act:commodity>" +
-            "<act:commodity-scu>100</act:commodity-scu>" +
-            "<act:description>Assets</act:description>" +
+            "</act:commodity>" + 
+            "<act:commodity-scu>100</act:commodity-scu>" + 
+            "<act:description>Assets</act:description>" + /*
             "<act:slots>" +
                 "<slot>" +
                     "<slot:key>placeholder</slot:key>" +
                     "<slot:value type=\"string\">true</slot:value>" +
                 "</slot>" +
-            "</act:slots>" +
+            "</act:slots>" */ 
             "</gnc:account>";
         
         [Test]
         public void TestOne()
         {
             XmlReader reader = XmlReaderFactory.CreateReader(sampleXml);
-            XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
-            nms.Add("cmdty", "http://www.gnucash.org/XML/cmdty");
-            nms.Add("gnc", "http://www.gnucash.org/XML/gnc");
-
             XmlSerializer s = new XmlSerializer(typeof(Account));
-            Account a = s.Deserialize(reader) as Account;
+            Account a = (Account) s.Deserialize(reader);
+            Assert.AreEqual("Assets", a.Name);
+            Assert.AreEqual("0739c8984c8d9a604cf8784907d5232d", a.Id.Value.ToString("N"));
+            Assert.AreEqual(AccountType.ASSET, a.AccountType);
+            Assert.AreEqual("ISO4217", a.CommodityId.Namespace);
+            Assert.AreEqual("USD", a.CommodityId.Mnemonic);
+            Assert.AreEqual(100, a.CommodityScu);
+            Assert.AreEqual("Assets", a.Description);
+
+            StringBuilder bldr = new StringBuilder();
+            XmlWriter writer = XmlWriterFactory.Create(bldr);
+            XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
+            nms.Add("gnc", Namespaces.GnuCash);
+            nms.Add("act", Namespaces.Account);
+            nms.Add("cmdty", Namespaces.Commodity);
+            s.Serialize(writer, a, nms);
+            string newXml = bldr.ToString();
+            Console.WriteLine(newXml);
             
-            Assert.IsNotNull(a);
             
         }
 

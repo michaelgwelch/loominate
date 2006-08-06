@@ -40,7 +40,6 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Transaction.cs" />
-    <Compile Include="Account.cs" />
     <Compile Include="AccountGroup.cs" />
     <Compile Include="AccountType.cs" />
     <Compile Include="Commodity.cs" />
@@ -53,6 +52,8 @@
     <Compile Include="Test\XmlWriterFactory.cs" />
     <Compile Include="Test\XmlReaderFactory.cs" />
     <Compile Include="Namespaces.cs" />
+    <Compile Include="Test\TestAccountSerialization.cs" />
+    <Compile Include="Account.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Test" />

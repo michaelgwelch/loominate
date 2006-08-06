@@ -149,20 +149,15 @@ namespace Loominate.Engine
             return UniqueName.GetHashCode();
         }
 
-        //		public void ReadXml(XmlReader reader)
-        //		{
-        //
-        //		
-        //			for(reader.MoveToContent(); reader.IsStartElement(); reader.MoveToContent())
-        //			{
-        //				if (reader.IsStartElement("cmdty:space")) nameSpace=reader.ReadElementString();
-        //				if (reader.IsStartElement("cmdty:name")) fullName=reader.ReadElementString();
-        //				if (reader.IsStartElement("cmdty:fraction")) 
-        //				else reader.Skip();
-        //			}
-        //		
-        //		}
 
+        public class CommodityId
+        {
+            [XmlElement("space", Namespace = cmdtyNs)]
+            public string Namespace;
+
+            [XmlElement("id", Namespace = cmdtyNs)]
+            public string Mnemonic;
+        }
 
     }
 

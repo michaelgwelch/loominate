@@ -24,18 +24,18 @@ namespace Loominate.Engine
     {
         BadType     = -1,
         NoType      = -1,
-        Bank        = 0,    // Savings or checking account, often interest bearing   
-        Cash        = 1,    // Cash on hand
-        Asset       = 2,    // Generic generalized account for assets (other than bank and cash)
-        Credit      = 3,    // Credit (e.g. amex) and debit accounts (e.g. visa, mastercard)
-        Liability   = 4,    // Generic generalized account for liabilities
-        Stock       = 5,    // Stocks, generally shown with three columns: price, shares, value
-        Mutual      = 6,    // Mutual fund, three columns like stocks
+        BANK        = 0,    // Savings or checking account, often interest bearing   
+        CASH        = 1,    // Cash on hand
+        ASSET       = 2,    // Generic generalized account for assets (other than bank and cash)
+        CREDIT      = 3,    // Credit (e.g. amex) and debit accounts (e.g. visa, mastercard)
+        LIABILITY   = 4,    // Generic generalized account for liabilities
+        STOCK       = 5,    // Stocks, generally shown with three columns: price, shares, value
+        MUTUAL      = 6,    // Mutual fund, three columns like stocks
 // deprecated        Currency    = 7,    // Like a stock account. used for trading currency. 
-        Income      = 8,    
-        Expense     = 9,
-        Equity      = 10,   // Used to balance the balance sheet
-        Receivable  = 11,   // Accounts receivable
-        Payable     = 12,   // Accounts payable
+        INCOME      = 8,    
+        EXPENSE     = 9,
+        EQUITY      = 10,   // Used to balance the balance sheet
+        RECEIVABLE  = 11,   // Accounts receivable
+        PAYABLE     = 12,   // Accounts payable
     }
 }
