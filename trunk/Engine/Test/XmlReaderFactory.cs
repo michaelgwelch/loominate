@@ -37,7 +37,7 @@ namespace Loominate.Engine
             mgr.AddNamespace("gnc", Namespaces.GnuCash);
             mgr.AddNamespace("act", Namespaces.Account);
             mgr.AddNamespace("cmdty", Namespaces.Commodity);
-
+            mgr.AddNamespace("slot", Namespaces.Slot);
             XmlParserContext context = new XmlParserContext(tbl, mgr, null, XmlSpace.Default);
 
             XmlReaderSettings settings = new XmlReaderSettings();
