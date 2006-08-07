@@ -32,6 +32,9 @@ namespace Loominate.Engine
         public string Version = "2.0.0";
 
         // QofInstance inst;
+        Dictionary<string, string> kvps;
+
+
         string accountName;
         AccountId id;
         //        string accountCode;
@@ -117,7 +120,7 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement(Namespace=Namespaces.Account, ElementName="commodity", Type=typeof(Commodity.CommodityId))]
+        [XmlElement(Namespace = Namespaces.Account, ElementName = "commodity", Type = typeof(Commodity.CommodityId))]
         public Commodity.CommodityId CommodityId
         {
             // TODO instead of saving the id info, we really want to lookup the actual commodity
@@ -132,7 +135,7 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement(Namespace=Namespaces.Account, ElementName="commodity-scu")]
+        [XmlElement(Namespace = Namespaces.Account, ElementName = "commodity-scu")]
         public int CommodityScu
         {
             get
@@ -145,7 +148,7 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement(Namespace = Namespaces.Account, ElementName="description")]
+        [XmlElement(Namespace = Namespaces.Account, ElementName = "description")]
         public string Description
         {
             get
@@ -155,6 +158,51 @@ namespace Loominate.Engine
             set
             {
                 description = value;
+            }
+        }
+
+        [XmlIgnore]
+        public bool IsPlaceholder
+        {
+            get
+            {
+                if (kvps.ContainsKey("placeholder"))
+                    return bool.Parse(kvps["placeholder"]);
+
+                return false;
+            }
+        }
+
+        [XmlArrayItem(Namespace = "", ElementName = "slot")]
+        [XmlArray(Namespace = Namespaces.Account, ElementName = "slots")]
+        public Slot[] Slots
+        {
+            get
+            {
+                if (kvps != null)
+                {
+                    Slot[] retVal = new Slot[kvps.Count];
+                    int i = 0;
+                    foreach (KeyValuePair<string, string> kvp in kvps)
+                    {
+                        Slot newSlot = new Slot();
+                        newSlot.Key = kvp.Key;
+                        newSlot.Value = kvp.Value;
+                        retVal[i] = newSlot;
+                        i++;
+                    }
+                    return retVal;
+                }
+                return null;
+            }
+            set
+            {
+                kvps = new Dictionary<string, string>();
+                if (value != null)
+                    foreach (Slot slot in value)
+                    {
+                        kvps[slot.Key] = slot.Value;
+                    }
             }
         }
 

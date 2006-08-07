@@ -42,13 +42,13 @@ namespace Loominate.Engine
                 "<cmdty:id>USD</cmdty:id>" +
             "</act:commodity>" + 
             "<act:commodity-scu>100</act:commodity-scu>" + 
-            "<act:description>Assets</act:description>" + /*
+            "<act:description>Assets</act:description>" + 
             "<act:slots>" +
                 "<slot>" +
                     "<slot:key>placeholder</slot:key>" +
                     "<slot:value type=\"string\">true</slot:value>" +
                 "</slot>" +
-            "</act:slots>" */ 
+            "</act:slots>" +
             "</gnc:account>";
         
         [Test]
@@ -64,6 +64,7 @@ namespace Loominate.Engine
             Assert.AreEqual("USD", a.CommodityId.Mnemonic);
             Assert.AreEqual(100, a.CommodityScu);
             Assert.AreEqual("Assets", a.Description);
+            Assert.AreEqual(true, a.IsPlaceholder);
 
             StringBuilder bldr = new StringBuilder();
             XmlWriter writer = XmlWriterFactory.Create(bldr);
@@ -71,6 +72,7 @@ namespace Loominate.Engine
             nms.Add("gnc", Namespaces.GnuCash);
             nms.Add("act", Namespaces.Account);
             nms.Add("cmdty", Namespaces.Commodity);
+            nms.Add("slot", Namespaces.Slot);
             s.Serialize(writer, a, nms);
             string newXml = bldr.ToString();
             Console.WriteLine(newXml);

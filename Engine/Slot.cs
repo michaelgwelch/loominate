@@ -1,4 +1,4 @@
-    /*******************************************************************************
+/*******************************************************************************
     Copyright 2006 Michael Welch
     
     This file is part of Loominate.
@@ -20,13 +20,16 @@
 
 namespace Loominate.Engine
 {
-    internal static class Namespaces
-    {
-        public const string GnuCash="http://www.gnucash.org/XML/gnc";
-        public const string Commodity="http://www.gnucash.org/XML/cmdty";
-        public const string Account="http://www.gnucash.org/XML/act";
-        public const string Slot = "http://www.gnucash.org/XML/slot";
+    using System;
+    using System.Xml.Serialization;
 
+    public class Slot 
+    {
+        [XmlElement(Namespace=Namespaces.Slot, ElementName="key")]
+        public string Key;
+        
+        [XmlElement(Namespace=Namespaces.Slot, ElementName="value", DataType="string")]
+        public string Value;
 
     }
 }
