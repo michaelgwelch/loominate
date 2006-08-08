@@ -25,24 +25,15 @@ namespace Loominate.Engine
     using System.Xml.Schema;
     using System.Xml.Serialization;
 
-    public class Book : IXmlSerializable
+    [XmlType(Namespace=Namespaces.GnuCash)]
+    [XmlRoot(Namespace=Namespaces.GnuCash, ElementName="book")]
+    public class Book
     {
         
         public Book()
         {
         }
 
-        void IXmlSerializable.ReadXml(XmlReader reader)
-        {
-        }
 
-        void IXmlSerializable.WriteXml(XmlWriter writer)
-        {
-        }
-
-        XmlSchema IXmlSerializable.GetSchema()
-        {
-            return null;
-        }
     }
 }
