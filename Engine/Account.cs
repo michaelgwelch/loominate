@@ -22,6 +22,7 @@ namespace Loominate.Engine
 {
     using System;
     using System.Collections.Generic;
+    using System.Xml;
     using System.Xml.Serialization;
 
     [XmlType(Namespace = Namespaces.GnuCash)]
@@ -206,32 +207,17 @@ namespace Loominate.Engine
             }
         }
 
-        public class AccountId : IXmlSerializable
+        public class AccountId : Id
         {
-            #region IXmlSerializable Members
-            public Guid Value;
-            public System.Xml.Schema.XmlSchema GetSchema()
+            public override void ReadStartElement(XmlReader reader)
             {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public void ReadXml(System.Xml.XmlReader reader)
-            {
-                reader.MoveToContent();
                 reader.ReadStartElement("id", Namespaces.Account);
-                Value = new Guid(reader.ReadString());
-                reader.ReadEndElement();
             }
 
-            public void WriteXml(System.Xml.XmlWriter writer)
+            public override void WriteStartElement(XmlWriter writer)
             {
                 writer.WriteStartElement("id", Namespaces.Account);
-                writer.WriteAttributeString("type", "guid");
-                writer.WriteString(Value.ToString("N"));
-                writer.WriteEndElement();
             }
-
-            #endregion
         }
 
 

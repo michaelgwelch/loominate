@@ -55,6 +55,7 @@
     <Compile Include="Test\TestAccountSerialization.cs" />
     <Compile Include="Account.cs" />
     <Compile Include="Slot.cs" />
+    <Compile Include="Id.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Test" />
