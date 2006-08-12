@@ -25,8 +25,6 @@ namespace Loominate.Engine
     using System.Xml.Schema;
     using System.Xml.Serialization;
 
-    [XmlType(Namespace = Namespaces.GnuCash)]
-    [XmlRoot(Namespace = Namespaces.GnuCash, ElementName = "commodity")]
     public class Commodity
     {
         private string fullName;
@@ -35,10 +33,9 @@ namespace Loominate.Engine
         private string cusip;
         private int fraction;
         const string version = "2.0.0";
-        const string cmdtyNs = "http://www.gnucash.org/XML/cmdty";
-        public Commodity() { }
+        public const string ElementName = "commodity";
 
-        public Commodity(Object book, string fullName, string nameSpace,
+        public Commodity(string fullName, string nameSpace,
                          string mnemonic, string cusip, int fraction)
         {
             this.fullName = fullName;
@@ -48,7 +45,6 @@ namespace Loominate.Engine
             this.fraction = fraction;
         }
 
-        [XmlAttribute("version", Namespace = cmdtyNs)]
         public String Version
         {
             get
@@ -61,7 +57,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement("name", Namespace = cmdtyNs)]
         public string FullName
         {
             get
@@ -74,7 +69,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement("space", Namespace = cmdtyNs)]
         public string Namespace
         {
             get
@@ -87,7 +81,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement("id", Namespace = cmdtyNs)]
         public string Mnemonic
         {
             get
@@ -100,7 +93,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement("xcode", Namespace = cmdtyNs)]
         public string Cusip
         {
             get
@@ -113,16 +105,14 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlIgnore()]
         public string UniqueName
         {
             get
             {
-                return nameSpace + "::" + mnemonic;
+                return CreateUniqueName(nameSpace, mnemonic);
             }
         }
 
-        [XmlElement("fraction", Namespace = cmdtyNs)]
         public int Fraction
         {
             get
@@ -133,6 +123,12 @@ namespace Loominate.Engine
             {
                 fraction = value;
             }
+        }
+
+
+        public static string CreateUniqueName(string ns, string mnemonic)
+        {
+            return ns + "::" + mnemonic;
         }
 
         public override bool Equals(object other)
@@ -150,13 +146,32 @@ namespace Loominate.Engine
         }
 
 
-        public class CommodityId
-        {
-            [XmlElement("space", Namespace = cmdtyNs)]
-            public string Namespace;
 
-            [XmlElement("id", Namespace = cmdtyNs)]
-            public string Mnemonic;
+        public static Commodity ReadXml(XmlReader reader)
+        {
+            reader.MoveToContent();
+
+            if (!reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected commodity");
+            if (reader.GetAttribute("version") != version) throw new XmlException("Expected commodity to be at version " + version);
+
+            reader.ReadStartElement(ElementName, Namespaces.GnuCash);
+            
+            string ns = reader.ReadElementString("space", Namespaces.Commodity);
+            string id = reader.ReadElementString("id", Namespaces.Commodity);
+            string name = reader.ReadElementString("name", Namespaces.Commodity);
+            string xcode = reader.ReadElementString("xcode", Namespaces.Commodity);
+            string fraction = reader.ReadElementString("fraction", Namespaces.Commodity);
+
+            
+            // just keep reading until we reach the commodity end element
+            while (reader.NodeType != XmlNodeType.EndElement || 
+                reader.LocalName != ElementName) reader.Read();
+
+            reader.ReadEndElement();
+
+            return new Commodity(name, ns, id, xcode, int.Parse(fraction));
+
+
         }
 
     }

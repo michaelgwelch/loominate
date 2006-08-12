@@ -33,13 +33,12 @@ namespace Loominate.Engine
         [Test]
         public void TestConstructor()
         {
-            Object book = null;
             String fullName = "US Dollar";
             String nameSpace = "Currency";
             String mnemonic = "USD";
             String cusip = "USD";
             int fraction = 100;
-            Commodity c = new Commodity(book, fullName, nameSpace, mnemonic,
+            Commodity c = new Commodity(fullName, nameSpace, mnemonic,
                 cusip, fraction);
                 
             String expected = nameSpace + "::" + mnemonic;
@@ -67,7 +66,7 @@ namespace Loominate.Engine
             string cusip = GetRandom.String();
             int fraction = rand.Next(0, 100001);
             
-            Commodity c = new Commodity(null, fullName, nameSpace,
+            Commodity c = new Commodity(fullName, nameSpace,
                                               mnemonic, cusip, fraction);
             Assert.AreEqual(fullName, c.FullName, "fullname equal test");
             Assert.AreEqual(nameSpace, c.Namespace, "namespace equal test");
@@ -103,9 +102,9 @@ namespace Loominate.Engine
         [Test]
         public void TestEquality()
         {
-            Commodity c1 = new Commodity(null, "US Dollar", "Currency",
+            Commodity c1 = new Commodity("US Dollar", "Currency",
                                             "USD", "cusip1", 100);
-            Commodity c2 = new Commodity(null, "US Doll", "Currency",
+            Commodity c2 = new Commodity("US Doll", "Currency",
                                             "USD", "cusip2", 105);
             
             Assert.AreEqual(c1, c2, "Commodities are equal if same" +

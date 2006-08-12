@@ -21,39 +21,42 @@
 namespace Loominate.Engine
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
     using System.Xml;
     using System.Xml.Serialization;
 
-    [XmlType(IncludeInSchema=false, AnonymousType=true)]
-    public abstract class Id : IXmlSerializable
+    public class GnuCashFile
     {
-        #region IXmlSerializable Members
-        public Guid Value;
-        public System.Xml.Schema.XmlSchema GetSchema()
+        private const string ElementName = "gnc-v2";
+
+        private Book[] books;
+
+        public GnuCashFile(Book[] books)
         {
-            throw new Exception("The method or operation is not implemented.");
+            this.books = books;
         }
 
-        public void ReadXml(XmlReader reader)
+        /// <summary>
+        /// Creates a new instance of File from the specified stream.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static GnuCashFile ReadXmlStream(Stream stream)
         {
+            XmlReader reader = new XmlTextReader(stream);
             reader.MoveToContent();
-            ReadStartElement(reader);
-            Value = new Guid(reader.ReadString());
-            reader.ReadEndElement();
+            reader.ReadStartElement(ElementName);
+
+            int numOfBooks = GnuCashReader.ReadCountData(reader, CountDataType.Book);
+            Book[] books = new Book[numOfBooks];
+
+            for (int i = 0; i < numOfBooks; i++)
+            {
+                books[i] = Book.ReadXml(reader);
+            }
+
+            return new GnuCashFile(books);
         }
-
-        public abstract void ReadStartElement(XmlReader reader);
-
-        public void WriteXml(XmlWriter writer)
-        {
-            //WriteStartElement(writer);
-            writer.WriteAttributeString("type", "guid");
-            writer.WriteString(Value.ToString("N"));
-            //writer.WriteEndElement();
-        }
-
-        public abstract void WriteStartElement(XmlWriter writer);
-
-        #endregion
     }
 }

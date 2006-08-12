@@ -5,3 +5,6 @@ Classes also know how to serialize/deserialize themselves.
 These classes correspond to the engine strucutres of gnucash.
 
 See http://gnucash.org
+
+The following link gives a schema (but it doesn't look complete)
+http://svn.gnucash.org/trac/browser/gnucash/trunk/src/doc/xml/gnucash-v2.rnc

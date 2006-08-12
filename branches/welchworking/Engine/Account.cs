@@ -25,51 +25,37 @@ namespace Loominate.Engine
     using System.Xml;
     using System.Xml.Serialization;
 
-    [XmlType(Namespace = Namespaces.GnuCash)]
-    [XmlRoot(Namespace = Namespaces.GnuCash, ElementName = "account")]
     public class Account
     {
-        [XmlAttribute("version", Namespace = Namespaces.Account)]
-        public string Version = "2.0.0";
+        public const string ElementName = "account";
+        private const string Version = "2.0.0";
 
-        // QofInstance inst;
         Dictionary<string, string> kvps;
 
 
         string accountName;
-        AccountId id;
-        //        string accountCode;
+        Guid id;
         string description;
         AccountType type;
-        Commodity commodity; Commodity.CommodityId commodityId;
+        string typeString;
         int commodityScu;
-        //        bool nonStandardScu;
-        //
-        //        AccountGroup parent;
-        //        AccountGroup children;
-        //
-        //        decimal startingBalance;
-        //        decimal startingClearedBalance;
-        //        decimal startingReconciledBalance;
-        //        
-        //        decimal balance;
-        //        decimal clearedBalance;
-        //        decimal reconciledBalance;
-        //        
-        //        int version;
-        //        uint versionCheck;
-        //        
-        //        List<Split> splits;
-        //        List<Lot> lots;
-        //        
-        //        //Policy policy;
-        //        
-        //        bool isBalanceDirty;
-        //        bool isSortDirty;
-        //        
-        //        short mark;
+        Commodity commodity;
+        Guid parent;
 
-        [XmlElement(Namespace = Namespaces.Account, ElementName = "name")]
+
+        public Account(String name, Guid id, String type, Commodity commodity, 
+            int commodityScu, string code, string description, Guid parent, Dictionary<string, string> kvps)
+        {
+            this.accountName = name;
+            this.id = id;
+            this.typeString = type;
+            this.commodity = commodity;
+            this.commodityScu = commodityScu;
+            this.description = description;
+            this.parent = parent;
+            this.kvps = kvps;
+        }
+
         public string Name
         {
             get
@@ -82,8 +68,7 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement(Namespace = Namespaces.Account, ElementName = "id")]
-        public AccountId Id
+        public Guid Id
         {
             get
             {
@@ -95,7 +80,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement(Namespace = Namespaces.Account, ElementName = "type")]
         public AccountType AccountType
         {
             get
@@ -108,33 +92,33 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlIgnore()]
-        public Commodity Commodity
-        {
-            get
-            {
-                return commodity;
-            }
-            set
-            {
-                commodity = value;
-            }
-        }
+        //[XmlIgnore()]
+        //public Commodity Commodity
+        //{
+        //    get
+        //    {
+        //        return commodity;
+        //    }
+        //    set
+        //    {
+        //        commodity = value;
+        //    }
+        //}
 
-        [XmlElement(Namespace = Namespaces.Account, ElementName = "commodity", Type = typeof(Commodity.CommodityId))]
-        public Commodity.CommodityId CommodityId
-        {
-            // TODO instead of saving the id info, we really want to lookup the actual commodity
-            // and change its value.
-            get
-            {
-                return commodityId;
-            }
-            set
-            {
-                commodityId = value;
-            }
-        }
+        //[XmlElement(Namespace = Namespaces.Account, ElementName = "commodity", Type = typeof(Commodity.CommodityId))]
+        //public Commodity.CommodityId CommodityId
+        //{
+        //    // TODO instead of saving the id info, we really want to lookup the actual commodity
+        //    // and change its value.
+        //    get
+        //    {
+        //        return commodityId;
+        //    }
+        //    set
+        //    {
+        //        commodityId = value;
+        //    }
+        //}
 
         [XmlElement(Namespace = Namespaces.Account, ElementName = "commodity-scu")]
         public int CommodityScu
@@ -162,7 +146,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlIgnore]
         public bool IsPlaceholder
         {
             get
@@ -207,19 +190,50 @@ namespace Loominate.Engine
             }
         }
 
-        public class AccountId : Id
+        public static Account ReadXml(XmlReader reader, Dictionary<string, Commodity> commodities)
         {
-            public override void ReadStartElement(XmlReader reader)
-            {
-                reader.ReadStartElement("id", Namespaces.Account);
+
+            if ( ! reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected account");
+            if (reader.GetAttribute("version") != Version) throw new XmlException("Expected Account to be version " + Version);
+            reader.Read(); // start element
+
+            string name = reader.ReadElementString("name", Namespaces.Account);
+            Guid id = GnuCashReader.ReadIdElement(reader, Namespaces.Account);
+            string type = reader.ReadElementString("type", Namespaces.Account);
+            
+            // Read the commodity identifier information
+            reader.ReadStartElement("commodity", Namespaces.Account);
+            string commodityns = reader.ReadElementString("space", Namespaces.Commodity);
+            string commodityid = reader.ReadElementString("id", Namespaces.Commodity);
+            string uniqueId = Commodity.CreateUniqueName(commodityns, commodityid);
+            Commodity c = commodities[uniqueId];
+            reader.ReadEndElement();
+
+            string commodityscu = reader.ReadElementString("commodity-scu", Namespaces.Account);
+            string code = GnuCashReader.ReadOptionalElementString(reader, "code", Namespaces.Account);
+            string nonstandardscu = GnuCashReader.ReadOptionalElementString(reader, "non-standard-scu", Namespaces.Account);
+            string description = GnuCashReader.ReadOptionalElementString(reader, "description", Namespaces.Account);
+            
+            Dictionary<string, string> slots = null;
+            if (reader.IsStartElement("slots", Namespaces.Account)) {
+                slots = GnuCashReader.ReadSlots(reader, Namespaces.Account);
             }
 
-            public override void WriteStartElement(XmlWriter writer)
-            {
-                writer.WriteStartElement("id", Namespaces.Account);
+            Guid parent = new Guid();
+            if (reader.IsStartElement("parent", Namespaces.Account)) {
+                parent = GnuCashReader.ReadIdElement(reader, Namespaces.Account, "parent");
             }
+
+            List<Lot> lots = new List<Lot>();
+            if (reader.IsStartElement("lots", Namespaces.Account))
+            {
+                throw new Exception("haven't implemented lots in Account parsing yet");
+            }
+
+            reader.ReadEndElement();
+
+            return new Account(name, id, type, c, int.Parse(commodityscu), code, description, parent, slots);
         }
-
 
     }
 }

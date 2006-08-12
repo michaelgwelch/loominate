@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <RootNamespace>Engine</RootNamespace>
+    <RootNamespace>Loominate.Engine</RootNamespace>
     <AssemblyName>Engine</AssemblyName>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -41,12 +41,14 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Book.cs" />
-    <Compile Include="Id.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="CountDataType.cs" />
+    <Compile Include="GnuCashFile.cs" />
+    <Compile Include="GnuCashReader.cs" />
     <Compile Include="Namespaces.cs" />
+    <Compile Include="ReconcileState.cs" />
     <Compile Include="Slot.cs" />
     <Compile Include="Test\TestAccountSerialization.cs" />
+    <Compile Include="Test\TestSplitSerialization.cs" />
     <Compile Include="Test\XmlReaderFactory.cs" />
     <Compile Include="Test\XmlWriterFactory.cs" />
     <Compile Include="Transaction.cs" />
