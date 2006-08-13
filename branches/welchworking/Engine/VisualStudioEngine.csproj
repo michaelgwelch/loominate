@@ -43,12 +43,13 @@
     <Compile Include="Book.cs" />
     <Compile Include="CountDataType.cs" />
     <Compile Include="GnuCashFile.cs" />
-    <Compile Include="GnuCashReader.cs" />
+    <Compile Include="GnuCashXml.cs" />
     <Compile Include="Namespaces.cs" />
     <Compile Include="ReconcileState.cs" />
     <Compile Include="Slot.cs" />
     <Compile Include="Test\TestAccountSerialization.cs" />
     <Compile Include="Test\TestSplitSerialization.cs" />
+    <Compile Include="Test\TestTransaction.cs" />
     <Compile Include="Test\XmlReaderFactory.cs" />
     <Compile Include="Test\XmlWriterFactory.cs" />
     <Compile Include="Transaction.cs" />

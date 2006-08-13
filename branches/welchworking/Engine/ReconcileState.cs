@@ -22,8 +22,8 @@ namespace Loominate.Engine
 {
     public enum ReconcileState
     {
-        n,
-        c,
-        y
+        NotReconciled,
+        Cleared,
+        Reconciled
     }
 }

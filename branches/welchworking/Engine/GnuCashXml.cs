@@ -25,12 +25,12 @@ namespace Loominate.Engine
     using System.Collections.Generic;
     using System.Xml;
 
-    internal static class GnuCashReader
+    internal static class GnuCashXml
     {
         // a map from CountDataTypes to the string used to identify them in xml.
         private static Dictionary<CountDataType, string> countDataTypes;
 
-        static GnuCashReader()
+        static GnuCashXml()
         {
             InitializeCountDataTypesDictionary();
 
@@ -130,5 +130,23 @@ namespace Loominate.Engine
             return null;
         }
 
+        /// <summary>
+        /// Reads commodity id information from reader, and then uses that to select the appropriate
+        /// commodity from commodities.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="ns">The namespace that the commodity element is part of.</param>
+        /// <param name="commodities"></param>
+        /// <returns></returns>
+        internal static Commodity GetCommodity(XmlReader reader, string ns, Dictionary<string, Commodity> commodities)
+        {
+            reader.ReadStartElement("commodity", ns);
+            string commodityns = reader.ReadElementString("space", Namespaces.Commodity);
+            string commodityid = reader.ReadElementString("id", Namespaces.Commodity);
+            string uniqueId = Commodity.CreateUniqueName(commodityns, commodityid);
+            Commodity c = commodities[uniqueId];
+            reader.ReadEndElement();
+            return c;
+        }
     }
 }

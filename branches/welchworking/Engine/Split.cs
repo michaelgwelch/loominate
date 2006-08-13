@@ -22,125 +22,109 @@
 namespace Loominate.Engine
 {
     using System;
+    using System.Diagnostics;
+    using System.Xml;
     using System.Xml.Serialization;
+
     /// <summary>
     /// A ledger entry
     /// </summary>
-    [XmlType(Namespace=Namespaces.Transaction)]
-    [XmlRoot(Namespace=Namespaces.Transaction, ElementName="split")]
     public class Split
     {
-        // QofInstance inst;
-        //SplitId id;
-//        Account acct;
-//        Account orighAcct;
-//        Lot lot;
-//        Transaction parent;
-//        Transaction origParent; //originating parent?
-//        
-//        
-        string memo;
-//        string action;
-//        DateTime dateReconciled;
-//        bool reconciled;
+        public const string ElementName = "split";
+
+
+        Guid id;
         ReconcileState reconcileState;
-//        
-//        // unsigned char gains
-//        
-//        Split gainsSplit;
-        decimal value;      // the value expressed in a known commodity
-        string valueString;
-        decimal amount;     // the ammount of the commodity involved
-        string amountString;
+        decimal value;
+        decimal quantity;
+        Guid accountId;
 
+        public Split(Guid id, ReconcileState reconcileState, decimal value, decimal quantity,
+            Guid accountId)
+        {
+            this.id = id;
+            this.reconcileState = reconcileState;
+            this.value = value;
+            this.quantity = quantity;
+            this.accountId = accountId;
+        }
 
-
-        [XmlElement(Namespace=Namespaces.Split, ElementName="memo")]
-        public String Memo
+        public Guid Id
         {
             get
             {
-                return memo;
-            }
-            set
-            {
-                memo = value;
+                return this.id;
             }
         }
 
-        [XmlElement(Namespace = Namespaces.Split, ElementName = "reconciled-state")]
         public ReconcileState ReconcileState
         {
             get
             {
-                return reconcileState;
-            }
-            set
-            {
-                reconcileState = value;
+                return this.reconcileState;
             }
         }
 
-        [XmlIgnore]
         public decimal Value
         {
             get
             {
                 return this.value;
             }
-            set
-            {
-                this.value = value;
-            }
         }
 
-        /// <summary>
-        /// Used for serialization. Not for external use.
-        /// </summary>
-        [XmlElement(Namespace=Namespaces.Split, ElementName="value")]
-        public String ValueString
+        public decimal Quantity
         {
             get
             {
-                return valueString;
-            }
-            set
-            {
-                valueString = value;
-                string[] nums = valueString.Split('/');
-                if (nums.Length != 2) throw new ApplicationException("Trouble parsing a split value");
-                else this.value = decimal.Parse(nums[0]) / decimal.Parse(nums[1]);
+                return this.quantity;
             }
         }
 
-        [XmlIgnore]
-        public decimal Amount
+        public Guid AccountId
         {
             get
             {
-                return amount;
-            }
-            set
-            {
-                amount = value;
+                return this.accountId;
             }
         }
 
-        [XmlIgnore]
-        public string AmountString
+        public static Split ReadXml(XmlReader reader)
         {
-            get
+            reader.ReadStartElement(ElementName, Namespaces.Transaction);
+
+            Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Split);
+            string reconcileString = reader.ReadElementString("reconciled-state", Namespaces.Split);
+            ReconcileState reconcileState;
+            switch (reconcileString)
             {
-                return amountString;
+                case "y":
+                    reconcileState = ReconcileState.Reconciled;
+                    break;
+                case "n":
+                    reconcileState = ReconcileState.NotReconciled;
+                    break;
+                case "c":
+                    reconcileState = ReconcileState.Cleared;
+                    break;
+                default:
+                    throw new XmlException("Expected a valid reconcile state");
             }
-            set
-            {
-                amountString = value;
-                string[] nums = value.Split('/');
-                if (nums.Length != 2) throw new ApplicationException("Trouble parsing a split amount");
-                amount = decimal.Parse(nums[0]) / decimal.Parse(nums[1]);
-            }
+
+            string value = GnuCashXml.ReadOptionalElementString(reader, "value", Namespaces.Split);
+            string qty = reader.ReadElementString("quantity", Namespaces.Split);
+
+            Guid accountId = GnuCashXml.ReadIdElement(reader, Namespaces.Split, "account");
+
+            return new Split(id, reconcileState, ParseGnumeric(value), ParseGnumeric(qty), accountId);
         }
 
+        private static decimal ParseGnumeric(string value)
+        {
+            string[] nums = value.Split('/');
+            return decimal.Parse(nums[0]) / decimal.Parse(nums[1]);
+
+        }
     }
 }

@@ -48,7 +48,7 @@ namespace Loominate.Engine
             reader.MoveToContent();
             reader.ReadStartElement(ElementName);
 
-            int numOfBooks = GnuCashReader.ReadCountData(reader, CountDataType.Book);
+            int numOfBooks = GnuCashXml.ReadCountData(reader, CountDataType.Book);
             Book[] books = new Book[numOfBooks];
 
             for (int i = 0; i < numOfBooks; i++)

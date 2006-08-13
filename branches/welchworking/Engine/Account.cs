@@ -198,30 +198,25 @@ namespace Loominate.Engine
             reader.Read(); // start element
 
             string name = reader.ReadElementString("name", Namespaces.Account);
-            Guid id = GnuCashReader.ReadIdElement(reader, Namespaces.Account);
+            Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Account);
             string type = reader.ReadElementString("type", Namespaces.Account);
             
             // Read the commodity identifier information
-            reader.ReadStartElement("commodity", Namespaces.Account);
-            string commodityns = reader.ReadElementString("space", Namespaces.Commodity);
-            string commodityid = reader.ReadElementString("id", Namespaces.Commodity);
-            string uniqueId = Commodity.CreateUniqueName(commodityns, commodityid);
-            Commodity c = commodities[uniqueId];
-            reader.ReadEndElement();
+            Commodity c = GnuCashXml.GetCommodity(reader, Namespaces.Account, commodities);
 
             string commodityscu = reader.ReadElementString("commodity-scu", Namespaces.Account);
-            string code = GnuCashReader.ReadOptionalElementString(reader, "code", Namespaces.Account);
-            string nonstandardscu = GnuCashReader.ReadOptionalElementString(reader, "non-standard-scu", Namespaces.Account);
-            string description = GnuCashReader.ReadOptionalElementString(reader, "description", Namespaces.Account);
+            string code = GnuCashXml.ReadOptionalElementString(reader, "code", Namespaces.Account);
+            string nonstandardscu = GnuCashXml.ReadOptionalElementString(reader, "non-standard-scu", Namespaces.Account);
+            string description = GnuCashXml.ReadOptionalElementString(reader, "description", Namespaces.Account);
             
             Dictionary<string, string> slots = null;
             if (reader.IsStartElement("slots", Namespaces.Account)) {
-                slots = GnuCashReader.ReadSlots(reader, Namespaces.Account);
+                slots = GnuCashXml.ReadSlots(reader, Namespaces.Account);
             }
 
             Guid parent = new Guid();
             if (reader.IsStartElement("parent", Namespaces.Account)) {
-                parent = GnuCashReader.ReadIdElement(reader, Namespaces.Account, "parent");
+                parent = GnuCashXml.ReadIdElement(reader, Namespaces.Account, "parent");
             }
 
             List<Lot> lots = new List<Lot>();
@@ -234,6 +229,8 @@ namespace Loominate.Engine
 
             return new Account(name, id, type, c, int.Parse(commodityscu), code, description, parent, slots);
         }
+
+
 
     }
 }

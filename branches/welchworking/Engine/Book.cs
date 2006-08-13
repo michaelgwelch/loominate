@@ -50,25 +50,25 @@ namespace Loominate.Engine
 
             reader.ReadStartElement(ElementName, Namespaces.GnuCash);
 
-            Guid id = GnuCashReader.ReadIdElement(reader, Namespaces.Book);
+            Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Book);
 
             Dictionary<string, string> slots = null;
             if (reader.IsStartElement("slots", Namespaces.Book)) {
-                slots = GnuCashReader.ReadSlots(reader, Namespaces.Book);
+                slots = GnuCashXml.ReadSlots(reader, Namespaces.Book);
             }
 
             // Note: All of the following except numOfAccounts and numOfTransactions is required.
             // Notice the use of ReadCountData for them instead of ReadCountDataOptional.
-            int numOfCommodities = GnuCashReader.ReadCountDataOptional(reader, CountDataType.Commodity);
-            int numOfAccounts = GnuCashReader.ReadCountData(reader, CountDataType.Account);
-            int numOfTransactions = GnuCashReader.ReadCountData(reader, CountDataType.Transaction);
-            int numOfScheduledTrans = GnuCashReader.ReadCountDataOptional(reader, CountDataType.ScheduledTransaction);
-            int numOfBudgets = GnuCashReader.ReadCountDataOptional(reader, CountDataType.Budget);
-            int numOfCustomers = GnuCashReader.ReadCountDataOptional(reader, CountDataType.Customer);
-            int numOfEmployees = GnuCashReader.ReadCountDataOptional(reader, CountDataType.Employee);
-            int numOfBillTerms = GnuCashReader.ReadCountDataOptional(reader, CountDataType.BillTerm);
-            int numOfInvoices = GnuCashReader.ReadCountDataOptional(reader, CountDataType.Invoice);
-            int numOfEntries = GnuCashReader.ReadCountDataOptional(reader, CountDataType.Entry);
+            int numOfCommodities = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Commodity);
+            int numOfAccounts = GnuCashXml.ReadCountData(reader, CountDataType.Account);
+            int numOfTransactions = GnuCashXml.ReadCountData(reader, CountDataType.Transaction);
+            int numOfScheduledTrans = GnuCashXml.ReadCountDataOptional(reader, CountDataType.ScheduledTransaction);
+            int numOfBudgets = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Budget);
+            int numOfCustomers = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Customer);
+            int numOfEmployees = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Employee);
+            int numOfBillTerms = GnuCashXml.ReadCountDataOptional(reader, CountDataType.BillTerm);
+            int numOfInvoices = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Invoice);
+            int numOfEntries = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Entry);
 
             Dictionary<string, Commodity> commodities = new Dictionary<string, Commodity>();
             ReadCommodities(reader, commodities);

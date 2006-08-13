@@ -17,11 +17,56 @@
     along with Loominate; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 *******************************************************************************/
-    
+
 namespace Loominate.Engine
 {
-   public class Transaction
-   {
-   }
+    using System;
+    using System.Collections.Generic;
+    using System.Xml;
+
+    public class Transaction
+    {
+
+        public const string ElementName = "transaction";
+        const string version = "2.0.0";
+
+        Guid id;
+        Commodity commodity;
+
+        public Transaction(Guid id, Commodity commodity)
+        {
+            this.id = id;
+            this.commodity = commodity;
+        }
+
+        public Guid Id
+        {
+            get
+            {
+                return this.id;
+            }
+        }
+
+        public Commodity Commodity
+        {
+            get
+            {
+                return this.commodity;
+            }
+        }
+
+        public static Transaction ReadXml(XmlReader reader, Dictionary<string, Commodity> commodities)
+        {
+            if (!reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected transaction");
+            if (reader.GetAttribute("version") != version) throw new XmlException("Expected transaction to be version " + version);
+
+            reader.Read(); // reads start element
+
+            Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Transaction);
+            Commodity c = GnuCashXml.GetCommodity(reader, Namespaces.Transaction, commodities);
+
+            return new Transaction(id, c);
+        }
+    }
 }
     
