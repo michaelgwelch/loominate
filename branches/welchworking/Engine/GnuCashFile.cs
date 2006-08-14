@@ -37,6 +37,23 @@ namespace Loominate.Engine
             this.books = books;
         }
 
+        public void WriteXmlStream(Stream stream)
+        {
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            settings.Encoding = System.Text.Encoding.UTF8;
+            XmlWriter writer = XmlWriter.Create(stream, settings);
+
+            writer.WriteStartElement(ElementName);
+            GnuCashXml.WriteNamespaces(writer);
+            GnuCashXml.WriteCountData(writer, CountDataType.Book, books.Length);
+            this.books[0].WriteXml(writer);
+
+            writer.WriteEndElement();
+            writer.Flush();
+
+        }
+
         /// <summary>
         /// Creates a new instance of File from the specified stream.
         /// </summary>

@@ -32,17 +32,25 @@ namespace Loominate.Engine
         private string mnemonic;
         private string cusip;
         private int fraction;
+        private string getQuotes;
+        private string quoteSource;
+        private string quoteTz;
+
         const string version = "2.0.0";
         public const string ElementName = "commodity";
 
         public Commodity(string fullName, string nameSpace,
-                         string mnemonic, string cusip, int fraction)
+                         string mnemonic, string cusip, int fraction,
+                         string get_quotes, string quote_source, string quote_tz)
         {
             this.fullName = fullName;
             this.nameSpace = nameSpace;
             this.mnemonic = mnemonic;
             this.cusip = cusip;
             this.fraction = fraction;
+            this.getQuotes = get_quotes;
+            this.quoteSource = quote_source;
+            this.quoteTz = quote_tz;
         }
 
         public String Version
@@ -146,6 +154,21 @@ namespace Loominate.Engine
         }
 
 
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteStartElement(ElementName, Namespaces.Transaction);
+
+            writer.WriteElementString("space", Namespaces.Commodity, this.nameSpace);
+            writer.WriteElementString("id", Namespaces.Commodity, this.mnemonic);
+            writer.WriteElementString("name", Namespaces.Commodity, this.fullName);
+            writer.WriteElementString("xcode", Namespaces.Commodity, this.cusip);
+            writer.WriteElementString("fraction", Namespaces.Commodity, this.fraction.ToString());
+            writer.WriteElementString("get_quotes", Namespaces.Commodity, this.getQuotes);
+            writer.WriteElementString("quote_source", Namespaces.Commodity, this.quoteSource);
+            writer.WriteElementString("quote_tz", Namespaces.Commodity, this.quoteTz);
+
+            writer.WriteEndElement();
+        }
 
         public static Commodity ReadXml(XmlReader reader)
         {
@@ -161,15 +184,20 @@ namespace Loominate.Engine
             string name = reader.ReadElementString("name", Namespaces.Commodity);
             string xcode = reader.ReadElementString("xcode", Namespaces.Commodity);
             string fraction = reader.ReadElementString("fraction", Namespaces.Commodity);
+            string get_quotes = reader.ReadElementString("get_quotes", Namespaces.Commodity);
+            string quote_source = reader.ReadElementString("quote_source", Namespaces.Commodity);
+            string quote_tz = reader.ReadElementString("quote_tz", Namespaces.Commodity);
 
+            /*
+             *   <cmdty:get_quotes/>
+  <cmdty:quote_source>currency</cmdty:quote_source>
+  <cmdty:quote_tz/>*/
             
-            // just keep reading until we reach the commodity end element
-            while (reader.NodeType != XmlNodeType.EndElement || 
-                reader.LocalName != ElementName) reader.Read();
+
 
             reader.ReadEndElement();
 
-            return new Commodity(name, ns, id, xcode, int.Parse(fraction));
+            return new Commodity(name, ns, id, xcode, int.Parse(fraction), get_quotes, quote_source, quote_tz);
 
 
         }

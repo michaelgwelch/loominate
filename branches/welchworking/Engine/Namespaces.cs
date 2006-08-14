@@ -32,6 +32,7 @@ namespace Loominate.Engine
         public const string Split = "http://www.gnucash.org/XML/split";
         public const string ScheduledTransaction = "http://www.gnucash.org/XML/sx";
         public const string Transaction = "http://www.gnucash.org/XML/trn";
+        public const string Timestamp = "http://www.gnucash.org/XML/ts";
 
 
 /* 

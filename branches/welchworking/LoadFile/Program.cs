@@ -8,10 +8,15 @@ namespace LoadFile
     {
         static void Main(string[] args)
         {
-
+            GnuCashFile gnc;
             using (FileStream f = File.OpenRead(args[0]))
             {
-                GnuCashFile gnc = GnuCashFile.ReadXmlStream(f);
+                gnc = GnuCashFile.ReadXmlStream(f);
+            }
+
+            using (FileStream f = File.OpenWrite(args[1]))
+            {
+                gnc.WriteXmlStream(f);
             }
 
         }

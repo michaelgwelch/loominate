@@ -32,11 +32,25 @@ namespace Loominate.Engine
         private const string ElementName = "book";
 
         private Guid id;
-        //private Dictionary<string, Commodity> commodities;
+        private Dictionary<string, Commodity> commodities;
+        private List<Account> accounts;
+        private List<Transaction> transactions;
 
-        public Book(Guid id)
+        public Book(Guid id, Dictionary<string, Commodity> commodities,
+            List<Account> accounts, List<Transaction> transactions)
         {
             this.id = id;
+            this.commodities = commodities;
+            this.accounts = accounts;
+            this.transactions = transactions;
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteStartElement(ElementName, Namespaces.GnuCash);
+            foreach (KeyValuePair<string, Commodity> kvp in commodities) kvp.Value.WriteXml(writer);
+            //foreach (Account account in accounts) account.WriteXml(writer);
+            //foreach (Transaction transaction in transactions) transaction.WriteXml(writer);
         }
 
         public static Book ReadXml(XmlReader reader)
@@ -76,7 +90,11 @@ namespace Loominate.Engine
             List<Account> accounts = new List<Account>(numOfAccounts);
             ReadAccounts(reader, accounts, commodities);
 
-            return new Book(id);
+            List<Transaction> transactions = new List<Transaction>(numOfTransactions);
+            ReadTransactions(reader, transactions, commodities);
+
+            reader.ReadEndElement();
+            return new Book(id, commodities, accounts, transactions);
 
 
         }
@@ -99,6 +117,16 @@ namespace Loominate.Engine
                 accounts.Add(a);
             }
         }
+
+        private static void ReadTransactions(XmlReader reader, List<Transaction> transactions,
+            Dictionary<string, Commodity> commodities)
+        {
+            while (reader.IsStartElement(Transaction.ElementName, Namespaces.GnuCash))
+            {
+                transactions.Add(Transaction.ReadXml(reader, commodities));
+            }
+        }
+        
 
 
     }

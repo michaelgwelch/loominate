@@ -202,7 +202,7 @@ namespace Loominate.Engine
             string type = reader.ReadElementString("type", Namespaces.Account);
             
             // Read the commodity identifier information
-            Commodity c = GnuCashXml.GetCommodity(reader, Namespaces.Account, commodities);
+            Commodity c = GnuCashXml.GetCommodity(reader, Commodity.ElementName, Namespaces.Account, commodities);
 
             string commodityscu = reader.ReadElementString("commodity-scu", Namespaces.Account);
             string code = GnuCashXml.ReadOptionalElementString(reader, "code", Namespaces.Account);

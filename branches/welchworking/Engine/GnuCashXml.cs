@@ -27,8 +27,10 @@ namespace Loominate.Engine
 
     internal static class GnuCashXml
     {
+        const string countDataElementName = "count-data";
+
         // a map from CountDataTypes to the string used to identify them in xml.
-        private static Dictionary<CountDataType, string> countDataTypes;
+        private static Dictionary<CountDataType, string> countDataTypeToString;
 
         static GnuCashXml()
         {
@@ -36,20 +38,50 @@ namespace Loominate.Engine
 
         }
 
+        private static void MapEnumsToStrings<T1, T2>(T1[] t1s, T2[] t2s,
+            out Dictionary<T1, T2> map1)
+        {
+            if (t1s.Length != t2s.Length) throw new ArgumentException("length of t1 != length of t2");
+
+            map1 = new Dictionary<T1,T2>();
+
+            for (int i = 0; i < t1s.Length; i++)
+            {
+                map1[t1s[i]] = t2s[i];
+            }
+        }
+
         private static void InitializeCountDataTypesDictionary()
         {
-            countDataTypes = new Dictionary<CountDataType, string>();
-            countDataTypes[CountDataType.Account] = "account";
-            countDataTypes[CountDataType.BillTerm] = "gnc:GncBillTerm";
-            countDataTypes[CountDataType.Book] = "book";
-            countDataTypes[CountDataType.Budget] = "budget";
-            countDataTypes[CountDataType.Commodity] = "commodity";
-            countDataTypes[CountDataType.Customer] = "gnc:GncCustomer";
-            countDataTypes[CountDataType.Employee] = "gnc:GncEmployee";
-            countDataTypes[CountDataType.Entry] = "gnc:GncEntry";
-            countDataTypes[CountDataType.Invoice] = "gnc:GncInvoice";
-            countDataTypes[CountDataType.ScheduledTransaction] = "schedxaction";
-            countDataTypes[CountDataType.Transaction] = "transaction";
+            CountDataType[] countDatas = new CountDataType[] {
+                CountDataType.Account,
+                CountDataType.BillTerm,
+                CountDataType.Book,
+                CountDataType.Budget,
+                CountDataType.Commodity,
+                CountDataType.Customer,
+                CountDataType.Employee,
+                CountDataType.Entry,
+                CountDataType.Invoice,
+                CountDataType.ScheduledTransaction,
+                CountDataType.Transaction };
+
+            string[] strings = new string[] {
+                "account",
+                "gnc:GncBillTerm",
+                "book",
+                "budget",
+                "commodity",
+                "gnc:GncCustomer",
+                "gnc:GncEmployee",
+                "gnc:GncEntry",
+                "gnc:GncInvoice",
+                "schedxaction",
+                "transaction" };
+
+            MapEnumsToStrings(countDatas, strings,
+                out countDataTypeToString);
+
         }
 
         internal static int ReadCountData(XmlReader reader, CountDataType type)
@@ -61,6 +93,61 @@ namespace Loominate.Engine
             return result;
         }
 
+        internal static void WriteCountData(XmlWriter writer, CountDataType type, int value)
+        {
+            writer.WriteElementString(countDataElementName,
+                countDataTypeToString[type], value.ToString());
+        }
+
+        internal static void WriteNamespaces(XmlWriter writer)
+        {
+            WriteNamespace(writer, "gnc", Namespaces.GnuCash);
+            WriteNamespace(writer, "act", Namespaces.Account);
+            WriteNamespace(writer, "book", Namespaces.Account);
+            WriteNamespace(writer, "cd", Namespaces.CountData);
+            WriteNamespace(writer, "cmdty", Namespaces.Commodity);
+            WriteNamespace(writer, "slot", Namespaces.Slot);
+            WriteNamespace(writer, "split", Namespaces.Split);
+            WriteNamespace(writer, "trn", Namespaces.Transaction);
+            WriteNamespace(writer, "ts", Namespaces.Timestamp);
+            /*
+             *      xmlns:gnc="http://www.gnucash.org/XML/gnc"
+     xmlns:act="http://www.gnucash.org/XML/act"
+     xmlns:book="http://www.gnucash.org/XML/book"
+     xmlns:cd="http://www.gnucash.org/XML/cd"
+     xmlns:cmdty="http://www.gnucash.org/XML/cmdty"
+     xmlns:price="http://www.gnucash.org/XML/price"
+     xmlns:slot="http://www.gnucash.org/XML/slot"
+     xmlns:split="http://www.gnucash.org/XML/split"
+     xmlns:sx="http://www.gnucash.org/XML/sx"
+     xmlns:trn="http://www.gnucash.org/XML/trn"
+     xmlns:ts="http://www.gnucash.org/XML/ts"
+     xmlns:fs="http://www.gnucash.org/XML/fs"
+     xmlns:bgt="http://www.gnucash.org/XML/bgt"
+     xmlns:recurrence="http://www.gnucash.org/XML/recurrence"
+     xmlns:lot="http://www.gnucash.org/XML/lot"
+     xmlns:cust="http://www.gnucash.org/XML/cust"
+     xmlns:job="http://www.gnucash.org/XML/job"
+     xmlns:addr="http://www.gnucash.org/XML/addr"
+     xmlns:owner="http://www.gnucash.org/XML/owner"
+     xmlns:taxtable="http://www.gnucash.org/XML/taxtable"
+     xmlns:tte="http://www.gnucash.org/XML/tte"
+     xmlns:employee="http://www.gnucash.org/XML/employee"
+     xmlns:order="http://www.gnucash.org/XML/order"
+     xmlns:billterm="http://www.gnucash.org/XML/billterm"
+     xmlns:bt-days="http://www.gnucash.org/XML/bt-days"
+     xmlns:bt-prox="http://www.gnucash.org/XML/bt-prox"
+     xmlns:invoice="http://www.gnucash.org/XML/invoice"
+     xmlns:entry="http://www.gnucash.org/XML/entry"
+     xmlns:vendor="http://www.gnucash.org/XML/vendor"> */
+        }
+
+        private static void WriteNamespace(XmlWriter writer, string localName, string value)
+        {
+            writer.WriteAttributeString("xmlns", localName, null, value);
+        }
+
+
         /// <summary>
         /// Reads a count data element and returns the integer value. Returns -1 if the element is not found,
         /// because count data is sometimes optional.
@@ -70,21 +157,20 @@ namespace Loominate.Engine
         /// <returns></returns>
         internal static int ReadCountDataOptional(XmlReader reader, CountDataType type)
         {
-            const string elementName = "count-data";
 
             reader.MoveToContent();
 
             // if this isn't a count-data element then return -1, it's possible this
             // was an optional instance of this element. Let the caller sort it out.
-            if ( ! reader.IsStartElement(elementName, Namespaces.GnuCash)) return -1;
+            if ( ! reader.IsStartElement(countDataElementName, Namespaces.GnuCash)) return -1;
 
             // if count-data type is incorrect then return -1, it's possible this
             // was an optional instance of this element. Let the caller sort it out.
-            string expectedType = countDataTypes[type];
+            string expectedType = countDataTypeToString[type];
             string actualType = reader.GetAttribute("type", Namespaces.CountData);
             if (expectedType != actualType) return -1;
 
-            string val = reader.ReadElementString(elementName, Namespaces.GnuCash);
+            string val = reader.ReadElementString(countDataElementName, Namespaces.GnuCash);
             return int.Parse(val);
         }
 
@@ -137,10 +223,11 @@ namespace Loominate.Engine
         /// <param name="reader"></param>
         /// <param name="ns">The namespace that the commodity element is part of.</param>
         /// <param name="commodities"></param>
+        /// <param name="localName">"currency" or "commodity" depending on the parent element. You must specify the correct one.</param>
         /// <returns></returns>
-        internal static Commodity GetCommodity(XmlReader reader, string ns, Dictionary<string, Commodity> commodities)
+        internal static Commodity GetCommodity(XmlReader reader, string localName, string ns, Dictionary<string, Commodity> commodities)
         {
-            reader.ReadStartElement("commodity", ns);
+            reader.ReadStartElement(localName, ns);
             string commodityns = reader.ReadElementString("space", Namespaces.Commodity);
             string commodityid = reader.ReadElementString("id", Namespaces.Commodity);
             string uniqueId = Commodity.CreateUniqueName(commodityns, commodityid);

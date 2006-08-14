@@ -32,11 +32,27 @@ namespace Loominate.Engine
 
         Guid id;
         Commodity commodity;
+        string num;
+        DateTime datePosted;
+        DateTime dateEntered;
+        string description;
+        Dictionary<string, string> kvps;
+        List<Split> splits;
 
-        public Transaction(Guid id, Commodity commodity)
+        public Transaction(Guid id, Commodity commodity,
+             string num, DateTime posted, DateTime entered, 
+                 string description, Dictionary<string, string> kvps,
+                 List<Split> splits)
         {
             this.id = id;
             this.commodity = commodity;
+            this.num = num;
+            this.datePosted = posted;
+            this.dateEntered = entered;
+            this.description = description;
+            this.kvps = kvps;
+            this.splits = splits;
+
         }
 
         public Guid Id
@@ -63,10 +79,48 @@ namespace Loominate.Engine
             reader.Read(); // reads start element
 
             Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Transaction);
-            Commodity c = GnuCashXml.GetCommodity(reader, Namespaces.Transaction, commodities);
+            Commodity c = GnuCashXml.GetCommodity(reader, "currency", Namespaces.Transaction, commodities);
+            string num = GnuCashXml.ReadOptionalElementString(reader, "num", Namespaces.Transaction);
 
-            return new Transaction(id, c);
+            DateTime posted = ReadDatePosted(reader);
+            DateTime entered = ReadDateEntered(reader);
+            string description = reader.ReadElementString("description", Namespaces.Transaction);
+
+            Dictionary<string, string> kvps = null;
+            if (reader.IsStartElement("slots", Namespaces.Transaction))
+            {
+                kvps = GnuCashXml.ReadSlots(reader, Namespaces.Transaction);
+            }
+
+            List<Split> splits = new List<Split>();
+            reader.ReadStartElement("splits", Namespaces.Transaction);
+            while (reader.IsStartElement(Split.ElementName, Namespaces.Transaction))
+            {
+                splits.Add(Split.ReadXml(reader));
+            }
+            reader.ReadEndElement(); // </splits>
+            reader.ReadEndElement(); // </transaction>
+
+            return new Transaction(id, c, num, posted, entered, description, kvps, splits);
         }
+
+        private static DateTime ReadDatePosted(XmlReader reader)
+        {
+            reader.ReadStartElement("date-posted", Namespaces.Transaction);
+            DateTime posted = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
+            reader.ReadEndElement();
+            return posted;
+        }
+
+        private static DateTime ReadDateEntered(XmlReader reader)
+        {
+            reader.ReadStartElement("date-entered", Namespaces.Transaction);
+            DateTime posted = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
+            reader.ReadEndElement();
+            return posted;
+        }
+
+
     }
 }
     

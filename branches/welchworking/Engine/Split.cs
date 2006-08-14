@@ -116,7 +116,7 @@ namespace Loominate.Engine
             string qty = reader.ReadElementString("quantity", Namespaces.Split);
 
             Guid accountId = GnuCashXml.ReadIdElement(reader, Namespaces.Split, "account");
-
+            reader.ReadEndElement(); // </split>
             return new Split(id, reconcileState, ParseGnumeric(value), ParseGnumeric(qty), accountId);
         }
 
