@@ -51,6 +51,7 @@ namespace Loominate.Engine
             foreach (KeyValuePair<string, Commodity> kvp in commodities) kvp.Value.WriteXml(writer);
             //foreach (Account account in accounts) account.WriteXml(writer);
             //foreach (Transaction transaction in transactions) transaction.WriteXml(writer);
+            writer.WriteEndElement();
         }
 
         public static Book ReadXml(XmlReader reader)
