@@ -46,7 +46,8 @@ namespace Loominate.Engine
 
             writer.WriteStartElement(ElementName);
             GnuCashXml.WriteNamespaces(writer);
-            GnuCashXml.WriteCountData(writer, CountDataType.Book, books.Length);
+            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+                CountDataType.Book, books.Length);
             this.books[0].WriteXml(writer);
 
             writer.WriteEndElement();

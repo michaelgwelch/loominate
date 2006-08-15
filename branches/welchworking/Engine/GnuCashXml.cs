@@ -93,17 +93,22 @@ namespace Loominate.Engine
             return result;
         }
 
-        internal static void WriteCountData(XmlWriter writer, CountDataType type, int value)
+
+        internal static void WriteCountData(XmlWriter writer, 
+            string ns, CountDataType type, int value)
         {
-            writer.WriteElementString(countDataElementName,
-                countDataTypeToString[type], value.ToString());
+            writer.WriteStartElement(countDataElementName, ns);
+            writer.WriteAttributeString("type", Namespaces.CountData,
+                countDataTypeToString[type]);
+            writer.WriteValue(value.ToString());
+            writer.WriteEndElement();
         }
 
         internal static void WriteNamespaces(XmlWriter writer)
         {
             WriteNamespace(writer, "gnc", Namespaces.GnuCash);
             WriteNamespace(writer, "act", Namespaces.Account);
-            WriteNamespace(writer, "book", Namespaces.Account);
+            WriteNamespace(writer, "book", Namespaces.Book);
             WriteNamespace(writer, "cd", Namespaces.CountData);
             WriteNamespace(writer, "cmdty", Namespaces.Commodity);
             WriteNamespace(writer, "slot", Namespaces.Slot);
@@ -185,6 +190,17 @@ namespace Loominate.Engine
             return ReadIdElement(reader, ns, "id");
         }
 
+        internal static void WriteIdElement(XmlWriter writer, string ns, Guid value)
+        {
+            writer.WriteStartElement("id", ns);
+            writer.WriteStartAttribute("type");
+            writer.WriteValue("guid");
+            writer.WriteEndAttribute();
+            writer.WriteValue(value.ToString("N"));
+            writer.WriteEndElement();
+            
+        }
+
         internal static Guid ReadIdElement(XmlReader reader, string ns, string localName)
         {
             reader.MoveToContent();
@@ -235,5 +251,14 @@ namespace Loominate.Engine
             reader.ReadEndElement();
             return c;
         }
+
+        internal static void WriteCommodityId(XmlWriter writer, string localName, string ns, Commodity c)
+        {
+            writer.WriteStartElement(localName, ns);
+            writer.WriteElementString("space", Namespaces.Commodity, c.Namespace);
+            writer.WriteElementString("id", Namespaces.Commodity, c.Mnemonic);
+            writer.WriteEndElement();
+        }
+
     }
 }

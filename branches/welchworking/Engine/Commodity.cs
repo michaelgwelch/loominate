@@ -156,8 +156,8 @@ namespace Loominate.Engine
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteStartElement(ElementName, Namespaces.Transaction);
-
+            writer.WriteStartElement(ElementName, Namespaces.GnuCash);
+            writer.WriteAttributeString("version", version);
             writer.WriteElementString("space", Namespaces.Commodity, this.nameSpace);
             writer.WriteElementString("id", Namespaces.Commodity, this.mnemonic);
             writer.WriteElementString("name", Namespaces.Commodity, this.fullName);
