@@ -45,14 +45,14 @@ namespace Loominate.Engine
             this.transactions = transactions;
         }
 
-        public void WriteXml(XmlWriter writer)
+        internal void WriteXml(XmlGnuCashWriter writer)
         {
             writer.WriteStartElement(ElementName, Namespaces.GnuCash);
             writer.WriteAttributeString("version", "", VersionXml);
             GnuCashXml.WriteIdElement(writer, Namespaces.Book, this.id);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            writer.WriteCountData(Namespaces.GnuCash,
                 CountDataType.Account, accounts.Count);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            writer.WriteCountData(Namespaces.GnuCash,
                 CountDataType.Transaction, transactions.Count);
             foreach (KeyValuePair<string, Commodity> kvp in commodities) kvp.Value.WriteXml(writer);
             foreach (Account account in accounts) account.WriteXml(writer);

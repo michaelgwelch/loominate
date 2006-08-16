@@ -27,28 +27,28 @@ namespace Loominate.Engine
 
     internal static class GnuCashXml
     {
+
         const string countDataElementName = "count-data";
 
         // a map from CountDataTypes to the string used to identify them in xml.
         private static Dictionary<CountDataType, string> countDataTypeToString;
-
-        static GnuCashXml()
-        {
-            InitializeCountDataTypesDictionary();
-
-        }
 
         private static void MapEnumsToStrings<T1, T2>(T1[] t1s, T2[] t2s,
             out Dictionary<T1, T2> map1)
         {
             if (t1s.Length != t2s.Length) throw new ArgumentException("length of t1 != length of t2");
 
-            map1 = new Dictionary<T1,T2>();
+            map1 = new Dictionary<T1, T2>();
 
             for (int i = 0; i < t1s.Length; i++)
             {
                 map1[t1s[i]] = t2s[i];
             }
+        }
+
+        static GnuCashXml()
+        {
+            InitializeCountDataTypesDictionary();
         }
 
         private static void InitializeCountDataTypesDictionary()
@@ -84,6 +84,9 @@ namespace Loominate.Engine
 
         }
 
+
+
+
         internal static int ReadCountData(XmlReader reader, CountDataType type)
         {
             int result = ReadCountDataOptional(reader, type);
@@ -94,63 +97,8 @@ namespace Loominate.Engine
         }
 
 
-        internal static void WriteCountData(XmlWriter writer, 
-            string ns, CountDataType type, int value)
-        {
-            writer.WriteStartElement(countDataElementName, ns);
-            writer.WriteAttributeString("type", Namespaces.CountData,
-                countDataTypeToString[type]);
-            writer.WriteValue(value.ToString());
-            writer.WriteEndElement();
-        }
 
-        internal static void WriteNamespaces(XmlWriter writer)
-        {
-            WriteNamespace(writer, "gnc", Namespaces.GnuCash);
-            WriteNamespace(writer, "act", Namespaces.Account);
-            WriteNamespace(writer, "book", Namespaces.Book);
-            WriteNamespace(writer, "cd", Namespaces.CountData);
-            WriteNamespace(writer, "cmdty", Namespaces.Commodity);
-            WriteNamespace(writer, "slot", Namespaces.Slot);
-            WriteNamespace(writer, "split", Namespaces.Split);
-            WriteNamespace(writer, "trn", Namespaces.Transaction);
-            WriteNamespace(writer, "ts", Namespaces.Timestamp);
-            /*
-             *      xmlns:gnc="http://www.gnucash.org/XML/gnc"
-     xmlns:act="http://www.gnucash.org/XML/act"
-     xmlns:book="http://www.gnucash.org/XML/book"
-     xmlns:cd="http://www.gnucash.org/XML/cd"
-     xmlns:cmdty="http://www.gnucash.org/XML/cmdty"
-     xmlns:price="http://www.gnucash.org/XML/price"
-     xmlns:slot="http://www.gnucash.org/XML/slot"
-     xmlns:split="http://www.gnucash.org/XML/split"
-     xmlns:sx="http://www.gnucash.org/XML/sx"
-     xmlns:trn="http://www.gnucash.org/XML/trn"
-     xmlns:ts="http://www.gnucash.org/XML/ts"
-     xmlns:fs="http://www.gnucash.org/XML/fs"
-     xmlns:bgt="http://www.gnucash.org/XML/bgt"
-     xmlns:recurrence="http://www.gnucash.org/XML/recurrence"
-     xmlns:lot="http://www.gnucash.org/XML/lot"
-     xmlns:cust="http://www.gnucash.org/XML/cust"
-     xmlns:job="http://www.gnucash.org/XML/job"
-     xmlns:addr="http://www.gnucash.org/XML/addr"
-     xmlns:owner="http://www.gnucash.org/XML/owner"
-     xmlns:taxtable="http://www.gnucash.org/XML/taxtable"
-     xmlns:tte="http://www.gnucash.org/XML/tte"
-     xmlns:employee="http://www.gnucash.org/XML/employee"
-     xmlns:order="http://www.gnucash.org/XML/order"
-     xmlns:billterm="http://www.gnucash.org/XML/billterm"
-     xmlns:bt-days="http://www.gnucash.org/XML/bt-days"
-     xmlns:bt-prox="http://www.gnucash.org/XML/bt-prox"
-     xmlns:invoice="http://www.gnucash.org/XML/invoice"
-     xmlns:entry="http://www.gnucash.org/XML/entry"
-     xmlns:vendor="http://www.gnucash.org/XML/vendor"> */
-        }
 
-        private static void WriteNamespace(XmlWriter writer, string localName, string value)
-        {
-            writer.WriteAttributeString("xmlns", localName, null, value);
-        }
 
 
         /// <summary>
@@ -252,13 +200,7 @@ namespace Loominate.Engine
             return c;
         }
 
-        internal static void WriteCommodityId(XmlWriter writer, string localName, string ns, Commodity c)
-        {
-            writer.WriteStartElement(localName, ns);
-            writer.WriteElementString("space", Namespaces.Commodity, c.Namespace);
-            writer.WriteElementString("id", Namespaces.Commodity, c.Mnemonic);
-            writer.WriteEndElement();
-        }
+
 
     }
 }

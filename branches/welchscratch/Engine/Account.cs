@@ -190,14 +190,14 @@ namespace Loominate.Engine
             }
         }
 
-        public void WriteXml(XmlWriter writer)
+        internal void WriteXml(XmlGnuCashWriter writer)
         {
             writer.WriteStartElement(ElementName, Namespaces.GnuCash);
             writer.WriteAttributeString("version", Version);
             writer.WriteElementString("name", Namespaces.Account, this.accountName);
             GnuCashXml.WriteIdElement(writer, Namespaces.Account, this.id);
             writer.WriteElementString("type", Namespaces.Account, this.typeString);
-            GnuCashXml.WriteCommodityId(writer, "commodity", Namespaces.Account, this.commodity);
+            writer.WriteCommodityId("commodity", Namespaces.Account, this.commodity);
             writer.WriteEndElement();
         }
 
