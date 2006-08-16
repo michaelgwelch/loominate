@@ -33,14 +33,13 @@ namespace Loominate.Engine
         [Test]
         public void TestConstructor()
         {
-            Object book = null;
             String fullName = "US Dollar";
             String nameSpace = "Currency";
             String mnemonic = "USD";
             String cusip = "USD";
             int fraction = 100;
-            Commodity c = new Commodity(book, fullName, nameSpace, mnemonic,
-                cusip, fraction);
+            Commodity c = new Commodity(fullName, nameSpace, mnemonic,
+                cusip, fraction, String.Empty, "currency", String.Empty);
                 
             String expected = nameSpace + "::" + mnemonic;
             String actual = c.UniqueName;
@@ -67,8 +66,8 @@ namespace Loominate.Engine
             string cusip = GetRandom.String();
             int fraction = rand.Next(0, 100001);
             
-            Commodity c = new Commodity(null, fullName, nameSpace,
-                                              mnemonic, cusip, fraction);
+            Commodity c = new Commodity(fullName, nameSpace,
+                                              mnemonic, cusip, fraction, String.Empty, "currency", String.Empty);
             Assert.AreEqual(fullName, c.FullName, "fullname equal test");
             Assert.AreEqual(nameSpace, c.Namespace, "namespace equal test");
             Assert.AreEqual(mnemonic, c.Mnemonic, "mnemonic equal test");
@@ -103,10 +102,10 @@ namespace Loominate.Engine
         [Test]
         public void TestEquality()
         {
-            Commodity c1 = new Commodity(null, "US Dollar", "Currency",
-                                            "USD", "cusip1", 100);
-            Commodity c2 = new Commodity(null, "US Doll", "Currency",
-                                            "USD", "cusip2", 105);
+            Commodity c1 = new Commodity("US Dollar", "Currency",
+                                            "USD", "cusip1", 100, String.Empty, "currency", String.Empty);
+            Commodity c2 = new Commodity("US Doll", "Currency",
+                                            "USD", "cusip2", 105, String.Empty, "currency", String.Empty);
             
             Assert.AreEqual(c1, c2, "Commodities are equal if same" +
                                " namespace and mnemonic");
