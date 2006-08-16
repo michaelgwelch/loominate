@@ -2,16 +2,22 @@
   <Configurations active="TEST">
     <Configuration name="Debug" ctype="CombineConfiguration">
       <Entry build="True" name="Engine" configuration="Debug" />
+      <Entry build="True" name="loadfile2" configuration="Debug" />
     </Configuration>
     <Configuration name="Release" ctype="CombineConfiguration">
       <Entry build="True" name="Engine" configuration="Debug" />
+      <Entry build="True" name="loadfile2" configuration="Debug" />
     </Configuration>
-    <Configuration name="TEST" ctype="CombineConfiguration" />
+    <Configuration name="TEST" ctype="CombineConfiguration">
+      <Entry build="True" name="loadfile2" configuration="Debug" />
+    </Configuration>
   </Configurations>
-  <StartMode startupentry="TestDecimal" single="True">
+  <StartMode startupentry="loadfile2" single="True">
     <Execute type="None" entry="Engine" />
+    <Execute type="None" entry="loadfile2" />
   </StartMode>
   <Entries>
     <Entry filename="./Engine/Engine.mdp" />
+    <Entry filename="./loadfile2/loadfile2.mdp" />
   </Entries>
 </Combine>
