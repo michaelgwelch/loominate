@@ -190,15 +190,19 @@ namespace Loominate.Engine
             return ReadIdElement(reader, ns, "id");
         }
 
-        internal static void WriteIdElement(XmlWriter writer, string ns, Guid value)
+        internal static void WriteIdElement(XmlWriter writer, string ns, Guid value, string localName)
         {
-            writer.WriteStartElement("id", ns);
+            writer.WriteStartElement(localName, ns);
             writer.WriteStartAttribute("type");
             writer.WriteValue("guid");
             writer.WriteEndAttribute();
             writer.WriteValue(value.ToString("N"));
             writer.WriteEndElement();
-            
+        }
+
+        internal static void WriteIdElement(XmlWriter writer, string ns, Guid value)
+        {
+            WriteIdElement(writer, ns, value, "id");
         }
 
         internal static Guid ReadIdElement(XmlReader reader, string ns, string localName)

@@ -90,6 +90,31 @@ namespace Loominate.Engine
             }
         }
 
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteStartElement(ElementName, Namespaces.Transaction);
+            GnuCashXml.WriteIdElement(writer, Namespaces.Split, this.id);
+            string localName = "reconciled-state";
+            switch (this.reconcileState)
+            {
+                case ReconcileState.Reconciled:
+                    writer.WriteElementString(localName, Namespaces.Split, "y");
+                    break;
+                case ReconcileState.NotReconciled:
+                    writer.WriteElementString(localName, Namespaces.Split, "n");
+                    break;
+                case ReconcileState.Cleared:
+                    writer.WriteElementString(localName, Namespaces.Split, "c");
+                    break;
+                default:
+                    throw new Exception();
+            }
+            writer.WriteElementString("value", Namespaces.Split, this.value.ToString());
+            writer.WriteElementString("quantity", Namespaces.Split, this.quantity.ToString());
+            GnuCashXml.WriteIdElement(writer, Namespaces.Split, accountId, "parent");
+            writer.WriteEndElement(); // </split>
+        }
         public static Split ReadXml(XmlReader reader)
         {
             reader.ReadStartElement(ElementName, Namespaces.Transaction);

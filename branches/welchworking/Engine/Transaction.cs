@@ -71,6 +71,20 @@ namespace Loominate.Engine
             }
         }
 
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteStartElement(ElementName, Namespaces.GnuCash);
+            GnuCashXml.WriteIdElement(writer, Namespaces.Transaction, this.id);
+            GnuCashXml.WriteCommodityId(writer, "currency", Namespaces.Transaction, this.commodity);
+            WriteDatePosted(writer);
+            WriteDateEntered(writer);
+            writer.WriteElementString("description", Namespaces.Transaction, description);
+            writer.WriteStartElement("splits", Namespaces.Transaction);
+            foreach (Split split in splits) split.WriteXml(writer);
+            writer.WriteEndElement(); // </splits>
+            writer.WriteEndElement(); // </transaction>
+        }
+
         public static Transaction ReadXml(XmlReader reader, Dictionary<string, Commodity> commodities)
         {
             if (!reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected transaction");
@@ -104,12 +118,27 @@ namespace Loominate.Engine
             return new Transaction(id, c, num, posted, entered, description, kvps, splits);
         }
 
+        private void WriteDatePosted(XmlWriter writer)
+        {
+            writer.WriteStartElement("date-posted", Namespaces.Transaction);
+            writer.WriteElementString("date", Namespaces.Timestamp, datePosted.ToString());
+            writer.WriteEndElement();
+        }
+
         private static DateTime ReadDatePosted(XmlReader reader)
         {
             reader.ReadStartElement("date-posted", Namespaces.Transaction);
             DateTime posted = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
             reader.ReadEndElement();
             return posted;
+        }
+
+
+        private void WriteDateEntered(XmlWriter writer)
+        {
+            writer.WriteStartElement("date-entered", Namespaces.Transaction);
+            writer.WriteElementString("date", Namespaces.Timestamp, dateEntered.ToString());
+            writer.WriteEndElement();
         }
 
         private static DateTime ReadDateEntered(XmlReader reader)
