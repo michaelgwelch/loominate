@@ -25,8 +25,6 @@ namespace Loominate.Engine
     using System.Xml.Schema;
     using System.Xml.Serialization;
 
-    [XmlType(Namespace = Namespaces.GnuCash)]
-    [XmlRoot(Namespace = Namespaces.GnuCash, ElementName = "commodity")]
     public class Commodity
     {
         private string fullName;
@@ -34,21 +32,27 @@ namespace Loominate.Engine
         private string mnemonic;
         private string cusip;
         private int fraction;
-        const string version = "2.0.0";
-        const string cmdtyNs = "http://www.gnucash.org/XML/cmdty";
-        public Commodity() { }
+        private string getQuotes;
+        private string quoteSource;
+        private string quoteTz;
 
-        public Commodity(Object book, string fullName, string nameSpace,
-                         string mnemonic, string cusip, int fraction)
+        const string version = "2.0.0";
+        public const string ElementName = "commodity";
+
+        public Commodity(string fullName, string nameSpace,
+                         string mnemonic, string cusip, int fraction,
+                         string get_quotes, string quote_source, string quote_tz)
         {
             this.fullName = fullName;
             this.nameSpace = nameSpace;
             this.mnemonic = mnemonic;
             this.cusip = cusip;
             this.fraction = fraction;
+            this.getQuotes = get_quotes;
+            this.quoteSource = quote_source;
+            this.quoteTz = quote_tz;
         }
 
-        [XmlAttribute("version", Namespace = cmdtyNs)]
         public String Version
         {
             get
@@ -61,7 +65,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement("name", Namespace = cmdtyNs)]
         public string FullName
         {
             get
@@ -74,7 +77,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement("space", Namespace = cmdtyNs)]
         public string Namespace
         {
             get
@@ -87,7 +89,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement("id", Namespace = cmdtyNs)]
         public string Mnemonic
         {
             get
@@ -100,7 +101,6 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlElement("xcode", Namespace = cmdtyNs)]
         public string Cusip
         {
             get
@@ -113,16 +113,14 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlIgnore()]
         public string UniqueName
         {
             get
             {
-                return nameSpace + "::" + mnemonic;
+                return CreateUniqueName(nameSpace, mnemonic);
             }
         }
 
-        [XmlElement("fraction", Namespace = cmdtyNs)]
         public int Fraction
         {
             get
@@ -133,6 +131,12 @@ namespace Loominate.Engine
             {
                 fraction = value;
             }
+        }
+
+
+        public static string CreateUniqueName(string ns, string mnemonic)
+        {
+            return ns + "::" + mnemonic;
         }
 
         public override bool Equals(object other)
@@ -150,13 +154,52 @@ namespace Loominate.Engine
         }
 
 
-        public class CommodityId
+        public void WriteXml(XmlWriter writer)
         {
-            [XmlElement("space", Namespace = cmdtyNs)]
-            public string Namespace;
+            writer.WriteStartElement(ElementName, Namespaces.GnuCash);
+            writer.WriteAttributeString("version", version);
+            writer.WriteElementString("space", Namespaces.Commodity, this.nameSpace);
+            writer.WriteElementString("id", Namespaces.Commodity, this.mnemonic);
+            writer.WriteElementString("name", Namespaces.Commodity, this.fullName);
+            writer.WriteElementString("xcode", Namespaces.Commodity, this.cusip);
+            writer.WriteElementString("fraction", Namespaces.Commodity, this.fraction.ToString());
+            writer.WriteElementString("get_quotes", Namespaces.Commodity, this.getQuotes);
+            writer.WriteElementString("quote_source", Namespaces.Commodity, this.quoteSource);
+            writer.WriteElementString("quote_tz", Namespaces.Commodity, this.quoteTz);
 
-            [XmlElement("id", Namespace = cmdtyNs)]
-            public string Mnemonic;
+            writer.WriteEndElement();
+        }
+
+        public static Commodity ReadXml(XmlReader reader)
+        {
+            reader.MoveToContent();
+
+            if (!reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected commodity");
+            if (reader.GetAttribute("version") != version) throw new XmlException("Expected commodity to be at version " + version);
+
+            reader.ReadStartElement(ElementName, Namespaces.GnuCash);
+            
+            string ns = reader.ReadElementString("space", Namespaces.Commodity);
+            string id = reader.ReadElementString("id", Namespaces.Commodity);
+            string name = reader.ReadElementString("name", Namespaces.Commodity);
+            string xcode = reader.ReadElementString("xcode", Namespaces.Commodity);
+            string fraction = reader.ReadElementString("fraction", Namespaces.Commodity);
+            string get_quotes = reader.ReadElementString("get_quotes", Namespaces.Commodity);
+            string quote_source = reader.ReadElementString("quote_source", Namespaces.Commodity);
+            string quote_tz = reader.ReadElementString("quote_tz", Namespaces.Commodity);
+
+            /*
+             *   <cmdty:get_quotes/>
+  <cmdty:quote_source>currency</cmdty:quote_source>
+  <cmdty:quote_tz/>*/
+            
+
+
+            reader.ReadEndElement();
+
+            return new Commodity(name, ns, id, xcode, int.Parse(fraction), get_quotes, quote_source, quote_tz);
+
+
         }
 
     }

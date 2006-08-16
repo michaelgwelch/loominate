@@ -42,6 +42,13 @@
     <File name="./Test/TestCommoditySerialization.cs" subtype="Code" buildaction="Compile" />
     <File name="./Namespaces.cs" subtype="Code" buildaction="Compile" />
     <File name="./Test/XmlReaderFactory.cs" subtype="Code" buildaction="Compile" />
+    <File name="./CountDataType.cs" subtype="Code" buildaction="Compile" />
+    <File name="./GnuCashFile.cs" subtype="Code" buildaction="Compile" />
+    <File name="./GnuCashReader.cs" subtype="Code" buildaction="Compile" />
+    <File name="./Slot.cs" subtype="Code" buildaction="Compile" />
+    <File name="./ReconcileState.cs" subtype="Code" buildaction="Compile" />
+    <File name="./Test/TestReadFile.cs" subtype="Code" buildaction="Compile" />
+    <File name="./Test/XmlWriterFactory.cs" subtype="Code" buildaction="Compile" />
   </Contents>
   <References>
     <ProjectReference type="Gac" localcopy="True" refto="nunit.framework, Version=2.2.0.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77" />
