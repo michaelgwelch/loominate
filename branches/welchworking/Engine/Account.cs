@@ -150,6 +150,7 @@ namespace Loominate.Engine
         {
             get
             {
+                if (kvps == null) return false;
                 if (kvps.ContainsKey("placeholder"))
                     return bool.Parse(kvps["placeholder"]);
 
@@ -157,38 +158,7 @@ namespace Loominate.Engine
             }
         }
 
-        [XmlArrayItem(Namespace = "", ElementName = "slot")]
-        [XmlArray(Namespace = Namespaces.Account, ElementName = "slots")]
-        public Slot[] Slots
-        {
-            get
-            {
-                if (kvps != null)
-                {
-                    Slot[] retVal = new Slot[kvps.Count];
-                    int i = 0;
-                    foreach (KeyValuePair<string, string> kvp in kvps)
-                    {
-                        Slot newSlot = new Slot();
-                        newSlot.Key = kvp.Key;
-                        newSlot.Value = kvp.Value;
-                        retVal[i] = newSlot;
-                        i++;
-                    }
-                    return retVal;
-                }
-                return null;
-            }
-            set
-            {
-                kvps = new Dictionary<string, string>();
-                if (value != null)
-                    foreach (Slot slot in value)
-                    {
-                        kvps[slot.Key] = slot.Value;
-                    }
-            }
-        }
+
 
         public void WriteXml(XmlWriter writer)
         {
@@ -198,6 +168,24 @@ namespace Loominate.Engine
             GnuCashXml.WriteIdElement(writer, Namespaces.Account, this.id);
             writer.WriteElementString("type", Namespaces.Account, this.typeString);
             GnuCashXml.WriteCommodityId(writer, "commodity", Namespaces.Account, this.commodity);
+            writer.WriteElementString("commodity-scu", Namespaces.Account, this.commodityScu.ToString());
+            writer.WriteElementString("description", Namespaces.Account, this.description);
+            
+            if (IsPlaceholder)
+            {
+                writer.WriteStartElement("slots", Namespaces.Account);
+                writer.WriteStartElement("slot");
+                writer.WriteElementString("key", Namespaces.Slot, "placeholder");
+                writer.WriteStartElement("value", Namespaces.Slot);
+                writer.WriteAttributeString("type", "string");
+                writer.WriteValue("true");
+                writer.WriteEndElement(); // </value>
+                writer.WriteEndElement(); // </slot>
+                writer.WriteEndElement(); // </slots>
+            }
+                
+            if (parent != Guid.Empty)
+                GnuCashXml.WriteIdElement(writer, Namespaces.Account, parent);
             writer.WriteEndElement();
         }
 
