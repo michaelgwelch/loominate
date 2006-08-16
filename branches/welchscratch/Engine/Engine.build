@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project name="Engine" default="build" basedir=".">
+    <description>Engine is the core api of MyCash.</description>
+    <property name="debug" value="true" overwrite="false" />
+    <target name="clean" description="remove all generated files">
+    </target>
+    <target name="build" description="compiles the source code">
+        <csc target="library" output="../bin/Debug/Engine.dll" debug="${debug}">
+	    <sources>
+                <include name="Account.cs" />
+                <include name="Book.cs" />
+                <include name="AccountGroup.cs"/>
+                <include name="AccountType.cs"/>
+                <include name="AssemblyInfo.cs"/>
+                <include name="Commodity.cs"/>
+                <include name="Split.cs"/>
+                <include name="Transaction.cs"/>
+                <include name="Lot.cs" />
+                <include name="Policy.cs"/>
+            </sources>
+       </csc>
+    </target>
+</project>
