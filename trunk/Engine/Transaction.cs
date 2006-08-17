@@ -118,10 +118,11 @@ namespace Loominate.Engine
             return new Transaction(id, c, num, posted, entered, description, kvps, splits);
         }
 
+
         private void WriteDatePosted(XmlWriter writer)
         {
             writer.WriteStartElement("date-posted", Namespaces.Transaction);
-            writer.WriteElementString("date", Namespaces.Timestamp, datePosted.ToString());
+            writer.WriteElementString("date", Namespaces.Timestamp, FormatDateTime(datePosted));
             writer.WriteEndElement();
         }
 
@@ -137,7 +138,8 @@ namespace Loominate.Engine
         private void WriteDateEntered(XmlWriter writer)
         {
             writer.WriteStartElement("date-entered", Namespaces.Transaction);
-            writer.WriteElementString("date", Namespaces.Timestamp, dateEntered.ToString());
+            writer.WriteElementString("date", 
+                Namespaces.Timestamp, FormatDateTime(dateEntered));
             writer.WriteEndElement();
         }
 
@@ -147,6 +149,14 @@ namespace Loominate.Engine
             DateTime posted = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
             reader.ReadEndElement();
             return posted;
+        }
+
+        private static string FormatDateTime(DateTime dt)
+        {
+            System.Text.StringBuilder bldr = new System.Text.StringBuilder();
+            bldr.Append(dt.ToString("yyyy-MM-dd HH:mm:ss zzz"));
+            bldr.Replace(":", "", 20, 4);
+            return bldr.ToString();
         }
 
 
