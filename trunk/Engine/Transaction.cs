@@ -74,6 +74,7 @@ namespace Loominate.Engine
         public void WriteXml(XmlWriter writer)
         {
             writer.WriteStartElement(ElementName, Namespaces.GnuCash);
+            writer.WriteAttributeString("version", version);
             GnuCashXml.WriteIdElement(writer, Namespaces.Transaction, this.id);
             GnuCashXml.WriteCommodityId(writer, "currency", Namespaces.Transaction, this.commodity);
             WriteDatePosted(writer);

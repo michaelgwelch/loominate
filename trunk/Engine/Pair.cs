@@ -19,20 +19,22 @@
 *******************************************************************************/
 
 
+
 namespace Loominate.Engine
 {
-    internal enum CountDataType
+    /// <summary>
+    /// Represents a pair of related data.
+    /// </summary>
+    /// <typeparam name="F">The Type to use for the first value</typeparam>
+    /// <typeparam name="S">The Type to use for the second value</typeparam>
+    public class Pair<F, S>
     {
-        Book,
-        Commodity,
-        Account,
-        Transaction,
-        ScheduledTransaction,
-        Budget,
-        Customer,
-        Employee,
-        BillTerm,
-        Invoice,
-        Entry
+        public Pair(F first, S second)
+        {
+            this.First = first;
+            this.Second = second;
+        }
+        public F First;
+        public S Second;
     }
 }

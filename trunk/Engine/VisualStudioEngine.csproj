@@ -45,6 +45,7 @@
     <Compile Include="GnuCashFile.cs" />
     <Compile Include="GnuCashXml.cs" />
     <Compile Include="Namespaces.cs" />
+    <Compile Include="Pair.cs" />
     <Compile Include="ReconcileState.cs" />
     <Compile Include="Slot.cs" />
     <Compile Include="Test\TestAccountSerialization.cs" />
@@ -63,6 +64,9 @@
     <Compile Include="Test\TestCommodity.cs" />
     <Compile Include="Test\TestSplit.cs" />
     <Compile Include="Test\TestCommoditySerialization.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="COPYING" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>
