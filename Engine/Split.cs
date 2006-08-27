@@ -37,16 +37,25 @@ namespace Loominate.Engine
         Guid id;
         ReconcileState reconcileState;
         decimal value;
+        int valueFraction;
+
         decimal quantity;
+        int qtyFraction;
+
         Guid accountId;
 
-        public Split(Guid id, ReconcileState reconcileState, decimal value, decimal quantity,
+        public Split(Guid id, ReconcileState reconcileState, 
+            Pair<decimal, int> value, Pair<decimal, int> quantity,
             Guid accountId)
         {
             this.id = id;
             this.reconcileState = reconcileState;
-            this.value = value;
-            this.quantity = quantity;
+            this.value = value.First;
+            this.valueFraction = value.Second;
+
+            this.quantity = quantity.First;
+            this.qtyFraction = quantity.Second;
+
             this.accountId = accountId;
         }
 
@@ -110,9 +119,11 @@ namespace Loominate.Engine
                 default:
                     throw new Exception();
             }
-            writer.WriteElementString("value", Namespaces.Split, this.value.ToString());
-            writer.WriteElementString("quantity", Namespaces.Split, this.quantity.ToString());
-            GnuCashXml.WriteIdElement(writer, Namespaces.Split, accountId, "parent");
+            writer.WriteElementString("value", Namespaces.Split, 
+                FormatGnumeric(this.value, this.valueFraction));
+            writer.WriteElementString("quantity", Namespaces.Split, 
+                FormatGnumeric(this.quantity, this.qtyFraction));
+            GnuCashXml.WriteIdElement(writer, Namespaces.Split, accountId, "account");
             writer.WriteEndElement(); // </split>
         }
         public static Split ReadXml(XmlReader reader)
@@ -145,11 +156,26 @@ namespace Loominate.Engine
             return new Split(id, reconcileState, ParseGnumeric(value), ParseGnumeric(qty), accountId);
         }
 
-        private static decimal ParseGnumeric(string value)
+        /// <summary>
+        /// Parses the numeric strings used by gnucash into the 
+        /// value (stored in First) and denominator (stored in Second).
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static Pair<decimal, int> ParseGnumeric(string str)
         {
-            string[] nums = value.Split('/');
-            return decimal.Parse(nums[0]) / decimal.Parse(nums[1]);
+            string[] nums = str.Split('/');
+            decimal numerator = decimal.Parse(nums[0]);
+            int denominator = int.Parse(nums[1]);
+            decimal value = numerator / denominator;
 
+            return new Pair<decimal, int>(value, denominator);
+
+        }
+
+        private static string FormatGnumeric(decimal value, int fraction)
+        {
+            return (value * fraction).ToString() + "/" + fraction.ToString();
         }
     }
 }

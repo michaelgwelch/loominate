@@ -43,7 +43,7 @@ namespace Loominate.Engine
         Guid parent;
 
 
-        public Account(String name, Guid id, String type, Commodity commodity, 
+        public Account(String name, Guid id, String type, Commodity commodity,
             int commodityScu, string code, string description, Guid parent, Dictionary<string, string> kvps)
         {
             this.accountName = name;
@@ -170,7 +170,7 @@ namespace Loominate.Engine
             GnuCashXml.WriteCommodityId(writer, "commodity", Namespaces.Account, this.commodity);
             writer.WriteElementString("commodity-scu", Namespaces.Account, this.commodityScu.ToString());
             writer.WriteElementString("description", Namespaces.Account, this.description);
-            
+
             if (IsPlaceholder)
             {
                 writer.WriteStartElement("slots", Namespaces.Account);
@@ -183,23 +183,23 @@ namespace Loominate.Engine
                 writer.WriteEndElement(); // </slot>
                 writer.WriteEndElement(); // </slots>
             }
-                
+
             if (parent != Guid.Empty)
-                GnuCashXml.WriteIdElement(writer, Namespaces.Account, parent);
+                GnuCashXml.WriteIdElement(writer, Namespaces.Account, parent, "parent");
             writer.WriteEndElement();
         }
 
         public static Account ReadXml(XmlReader reader, Dictionary<string, Commodity> commodities)
         {
 
-            if ( ! reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected account");
+            if (!reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected account");
             if (reader.GetAttribute("version") != Version) throw new XmlException("Expected Account to be version " + Version);
             reader.Read(); // start element
 
             string name = reader.ReadElementString("name", Namespaces.Account);
             Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Account);
             string type = reader.ReadElementString("type", Namespaces.Account);
-            
+
             // Read the commodity identifier information
             Commodity c = GnuCashXml.GetCommodity(reader, Commodity.ElementName, Namespaces.Account, commodities);
 
@@ -207,14 +207,16 @@ namespace Loominate.Engine
             string code = GnuCashXml.ReadOptionalElementString(reader, "code", Namespaces.Account);
             string nonstandardscu = GnuCashXml.ReadOptionalElementString(reader, "non-standard-scu", Namespaces.Account);
             string description = GnuCashXml.ReadOptionalElementString(reader, "description", Namespaces.Account);
-            
+
             Dictionary<string, string> slots = null;
-            if (reader.IsStartElement("slots", Namespaces.Account)) {
+            if (reader.IsStartElement("slots", Namespaces.Account))
+            {
                 slots = GnuCashXml.ReadSlots(reader, Namespaces.Account);
             }
 
             Guid parent = new Guid();
-            if (reader.IsStartElement("parent", Namespaces.Account)) {
+            if (reader.IsStartElement("parent", Namespaces.Account))
+            {
                 parent = GnuCashXml.ReadIdElement(reader, Namespaces.Account, "parent");
             }
 
