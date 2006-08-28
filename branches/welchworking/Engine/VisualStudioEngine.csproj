@@ -1,0 +1,72 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Loominate.Engine</RootNamespace>
+    <AssemblyName>Engine</AssemblyName>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{39A9CDD0-64D1-4F68-94B7-9B0B7ECE0EA9}</ProjectGuid>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>4194304</BaseAddress>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <FileAlignment>4096</FileAlignment>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <Optimize>False</Optimize>
+    <DefineConstants>TRACE;DEBUG;TEST</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <Optimize>True</Optimize>
+    <DefineConstants>TRACE;DEBUG;TEST</DefineConstants>
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="nunit.framework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Book.cs" />
+    <Compile Include="CountDataType.cs" />
+    <Compile Include="GnuCashFile.cs" />
+    <Compile Include="GnuCashXml.cs" />
+    <Compile Include="Namespaces.cs" />
+    <Compile Include="Pair.cs" />
+    <Compile Include="ReconcileState.cs" />
+    <Compile Include="Slot.cs" />
+    <Compile Include="Test\TestAccountSerialization.cs" />
+    <Compile Include="Test\TestSplitSerialization.cs" />
+    <Compile Include="Test\TestTransaction.cs" />
+    <Compile Include="Test\XmlReaderFactory.cs" />
+    <Compile Include="Test\XmlWriterFactory.cs" />
+    <Compile Include="Transaction.cs" />
+    <Compile Include="Account.cs" />
+    <Compile Include="AccountGroup.cs" />
+    <Compile Include="AccountType.cs" />
+    <Compile Include="Commodity.cs" />
+    <Compile Include="Lot.cs" />
+    <Compile Include="Split.cs" />
+    <Compile Include="Test\GetRandom.cs" />
+    <Compile Include="Test\TestCommodity.cs" />
+    <Compile Include="Test\TestSplit.cs" />
+    <Compile Include="Test\TestCommoditySerialization.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="COPYING" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
+</Project>
