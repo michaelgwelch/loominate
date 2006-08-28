@@ -47,7 +47,6 @@
     <Compile Include="Namespaces.cs" />
     <Compile Include="Pair.cs" />
     <Compile Include="ReconcileState.cs" />
-    <Compile Include="Slot.cs" />
     <Compile Include="Test\TestAccountSerialization.cs" />
     <Compile Include="Test\TestSplitSerialization.cs" />
     <Compile Include="Test\TestTransaction.cs" />

@@ -24,6 +24,9 @@ namespace Loominate.Engine
     using System.Collections.Generic;
     using System.Xml;
 
+    using Slots = System.Collections.Generic.Dictionary<string, Pair<string, object>>;
+    using SplitList = System.Collections.Generic.List<Split>;
+
     public class Transaction
     {
 
@@ -34,15 +37,15 @@ namespace Loominate.Engine
         Commodity commodity;
         string num;
         DateTime datePosted;
-        DateTime dateEntered;
+        Pair<DateTime, int?> dateEntered;
         string description;
-        Dictionary<string, string> kvps;
-        List<Split> splits;
+        Slots kvps;
+        SplitList splits;
 
         public Transaction(Guid id, Commodity commodity,
-             string num, DateTime posted, DateTime entered, 
-                 string description, Dictionary<string, string> kvps,
-                 List<Split> splits)
+             string num, DateTime posted, Pair<DateTime, int?> entered, 
+                 string description, Slots kvps,
+                 SplitList splits)
         {
             this.id = id;
             this.commodity = commodity;
@@ -98,16 +101,16 @@ namespace Loominate.Engine
             string num = GnuCashXml.ReadOptionalElementString(reader, "num", Namespaces.Transaction);
 
             DateTime posted = ReadDatePosted(reader);
-            DateTime entered = ReadDateEntered(reader);
+            Pair<DateTime, int?> entered = ReadDateEntered(reader);
             string description = reader.ReadElementString("description", Namespaces.Transaction);
 
-            Dictionary<string, string> kvps = null;
+            Slots kvps = null;
             if (reader.IsStartElement("slots", Namespaces.Transaction))
             {
-                kvps = GnuCashXml.ReadSlots(reader, Namespaces.Transaction);
+                kvps = GnuCashXml.ReadSlots(reader, Namespaces.Transaction, "slots");
             }
 
-            List<Split> splits = new List<Split>();
+            SplitList splits = new SplitList();
             reader.ReadStartElement("splits", Namespaces.Transaction);
             while (reader.IsStartElement(Split.ElementName, Namespaces.Transaction))
             {
@@ -140,16 +143,18 @@ namespace Loominate.Engine
         {
             writer.WriteStartElement("date-entered", Namespaces.Transaction);
             writer.WriteElementString("date", 
-                Namespaces.Timestamp, FormatDateTime(dateEntered));
+                Namespaces.Timestamp, FormatDateTime(dateEntered.First));
             writer.WriteEndElement();
         }
 
-        private static DateTime ReadDateEntered(XmlReader reader)
+        private static Pair<DateTime, int?> ReadDateEntered(XmlReader reader)
         {
             reader.ReadStartElement("date-entered", Namespaces.Transaction);
-            DateTime posted = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
+            DateTime entered = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
+            string nsString = GnuCashXml.ReadOptionalElementString(reader, "ns", Namespaces.Timestamp);
+            int? ns = (nsString == null) ? (int?)null : int.Parse(nsString);
             reader.ReadEndElement();
-            return posted;
+            return new Pair<DateTime, int?>(entered, ns);
         }
 
         private static string FormatDateTime(DateTime dt)
