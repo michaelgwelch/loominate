@@ -26,20 +26,28 @@ namespace Loominate.Engine
     using System.Xml.Schema;
     using System.Xml.Serialization;
 
+    using Slots = System.Collections.Generic.Dictionary<string, Pair<string, object>>;
+    using CommodityDictionary = System.Collections.Generic.Dictionary<string, Commodity>;
+    using AccountList = System.Collections.Generic.List<Account>;
+    using TransactionList = System.Collections.Generic.List<Transaction>;
+
     public class Book
     {
         private const string VersionXml = "2.0.0";
         private const string ElementName = "book";
 
         private Guid id;
-        private Dictionary<string, Commodity> commodities;
-        private List<Account> accounts;
-        private List<Transaction> transactions;
+        private Slots slots;
+        private CommodityDictionary commodities;
+        private AccountList accounts;
+        private TransactionList transactions;
 
-        public Book(Guid id, Dictionary<string, Commodity> commodities,
-            List<Account> accounts, List<Transaction> transactions)
+        public Book(Guid id, Slots slots,
+            CommodityDictionary commodities,
+            AccountList accounts, TransactionList transactions)
         {
             this.id = id;
+            this.slots = slots;
             this.commodities = commodities;
             this.accounts = accounts;
             this.transactions = transactions;
@@ -50,6 +58,7 @@ namespace Loominate.Engine
             writer.WriteStartElement(ElementName, Namespaces.GnuCash);
             writer.WriteAttributeString("version", "", VersionXml);
             GnuCashXml.WriteIdElement(writer, Namespaces.Book, this.id);
+            GnuCashXml.WriteSlots(writer, slots, "slots", Namespaces.Book, false);
             GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
                 CountDataType.Account, accounts.Count);
             GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
@@ -73,9 +82,9 @@ namespace Loominate.Engine
 
             Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Book);
 
-            Dictionary<string, string> slots = null;
+            Slots slots = null;
             if (reader.IsStartElement("slots", Namespaces.Book)) {
-                slots = GnuCashXml.ReadSlots(reader, Namespaces.Book);
+                slots = GnuCashXml.ReadSlots(reader, Namespaces.Book, "slots");
             }
 
             // Note: All of the following except numOfAccounts and numOfTransactions is required.
@@ -91,22 +100,22 @@ namespace Loominate.Engine
             int numOfInvoices = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Invoice);
             int numOfEntries = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Entry);
 
-            Dictionary<string, Commodity> commodities = new Dictionary<string, Commodity>();
+            CommodityDictionary commodities = new CommodityDictionary();
             ReadCommodities(reader, commodities);
 
-            List<Account> accounts = new List<Account>(numOfAccounts);
+            AccountList accounts = new AccountList(numOfAccounts);
             ReadAccounts(reader, accounts, commodities);
 
-            List<Transaction> transactions = new List<Transaction>(numOfTransactions);
+            TransactionList transactions = new TransactionList(numOfTransactions);
             ReadTransactions(reader, transactions, commodities);
 
             reader.ReadEndElement();
-            return new Book(id, commodities, accounts, transactions);
+            return new Book(id, slots, commodities, accounts, transactions);
 
 
         }
 
-        private static void ReadCommodities(XmlReader reader, Dictionary<string, Commodity> commodities)
+        private static void ReadCommodities(XmlReader reader, CommodityDictionary commodities)
         {
             while (reader.IsStartElement(Commodity.ElementName, Namespaces.GnuCash))
             {
@@ -115,8 +124,8 @@ namespace Loominate.Engine
             }
         }
 
-        private static void ReadAccounts(XmlReader reader, List<Account> accounts,
-            Dictionary<string, Commodity> commodities)
+        private static void ReadAccounts(XmlReader reader, AccountList accounts,
+            CommodityDictionary commodities)
         {
             while (reader.IsStartElement(Account.ElementName, Namespaces.GnuCash))
             {
@@ -125,8 +134,8 @@ namespace Loominate.Engine
             }
         }
 
-        private static void ReadTransactions(XmlReader reader, List<Transaction> transactions,
-            Dictionary<string, Commodity> commodities)
+        private static void ReadTransactions(XmlReader reader, TransactionList transactions,
+            CommodityDictionary commodities)
         {
             while (reader.IsStartElement(Transaction.ElementName, Namespaces.GnuCash))
             {

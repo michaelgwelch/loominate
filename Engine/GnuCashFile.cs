@@ -42,6 +42,7 @@ namespace Loominate.Engine
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
             settings.Encoding = System.Text.Encoding.UTF8;
+            settings.NewLineChars = "\n";
             XmlWriter writer = XmlWriter.Create(stream, settings);
 
             writer.WriteStartElement(ElementName);

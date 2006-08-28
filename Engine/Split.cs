@@ -35,6 +35,9 @@ namespace Loominate.Engine
 
 
         Guid id;
+        string memo;
+        string action;
+        DateTime? reconcileDate;
         ReconcileState reconcileState;
         decimal value;
         int valueFraction;
@@ -44,11 +47,15 @@ namespace Loominate.Engine
 
         Guid accountId;
 
-        public Split(Guid id, ReconcileState reconcileState, 
+        public Split(Guid id, string memo, string action, 
+            DateTime? reconcileDate, ReconcileState reconcileState, 
             Pair<decimal, int> value, Pair<decimal, int> quantity,
             Guid accountId)
         {
             this.id = id;
+            this.memo = memo;
+            this.action = action;
+            this.reconcileDate = reconcileDate;
             this.reconcileState = reconcileState;
             this.value = value.First;
             this.valueFraction = value.Second;
@@ -131,6 +138,8 @@ namespace Loominate.Engine
             reader.ReadStartElement(ElementName, Namespaces.Transaction);
 
             Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Split);
+            string memo = GnuCashXml.ReadOptionalElementString(reader, "memo", Namespaces.Split);
+            string action = GnuCashXml.ReadOptionalElementString(reader, "action", Namespaces.Split);
             string reconcileString = reader.ReadElementString("reconciled-state", Namespaces.Split);
             ReconcileState reconcileState;
             switch (reconcileString)
@@ -148,12 +157,13 @@ namespace Loominate.Engine
                     throw new XmlException("Expected a valid reconcile state");
             }
 
+            DateTime? reconcileDate = GnuCashXml.ReadDate(reader, "reconcile-date", Namespaces.Split);
             string value = GnuCashXml.ReadOptionalElementString(reader, "value", Namespaces.Split);
             string qty = reader.ReadElementString("quantity", Namespaces.Split);
 
             Guid accountId = GnuCashXml.ReadIdElement(reader, Namespaces.Split, "account");
             reader.ReadEndElement(); // </split>
-            return new Split(id, reconcileState, ParseGnumeric(value), ParseGnumeric(qty), accountId);
+            return new Split(id, memo, action, reconcileDate, reconcileState, ParseGnumeric(value), ParseGnumeric(qty), accountId);
         }
 
         /// <summary>

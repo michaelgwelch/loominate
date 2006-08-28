@@ -26,9 +26,13 @@ namespace Loominate.Engine
 {
 
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Xml;
 
+    using Slots = System.Collections.Generic.Dictionary<string, Pair<string, object>>;
+    using Slot = System.Collections.Generic.KeyValuePair<string, Pair<string, object>>;
+    using SlotValuePair = Pair<string, object>;
 
     internal static class GnuCashXml
     {
@@ -263,40 +267,85 @@ namespace Loominate.Engine
 
         }
 
-
-
-        internal static Dictionary<string, string> ReadSlots(XmlReader reader, string ns)
+        internal static DateTime? ReadDate(XmlReader reader, string localName, string ns)
         {
-
-            Dictionary<string, string> slots = new Dictionary<string, string>();
-
-
-
-            reader.ReadStartElement("slots", ns);
-
-            while (reader.IsStartElement("slot"))
+            if (reader.IsStartElement(localName, ns))
             {
-
                 reader.Read();
-
-                string key = reader.ReadElementString("key", Namespaces.Slot);
-
-                string value = reader.ReadElementString("value", Namespaces.Slot);
-
-                slots[key] = value;
-
+                DateTime date = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
                 reader.ReadEndElement();
+                return date;
+            }
+
+            return null;
+        }
+
+        internal static void WriteSlots(XmlWriter writer,
+            Slots slots, string localName, string ns, bool isFrame)
+        {
+            writer.WriteStartElement(localName, ns);
+            if (isFrame) writer.WriteAttributeString("type", "frame");
+
+            foreach (Slot slot in slots)
+            {
+                string key = slot.Key;
+                SlotValuePair value = slot.Value;
+                string type = value.First;
+                writer.WriteStartElement("slot");
+                writer.WriteElementString("key", Namespaces.Slot, key);
+
+                if (type == "frame")
+                {
+                    WriteSlots(writer, value.Second as Slots,
+                        "value", Namespaces.Slot, true);
+                }
+                else
+                {
+                    writer.WriteStartElement("value", Namespaces.Slot);
+                    writer.WriteAttributeString("type", type);
+                    writer.WriteString(value.Second.ToString());
+                    writer.WriteEndElement(); // </value>
+                }
+                writer.WriteEndElement(); // </slot>
 
             }
 
-            reader.ReadEndElement();
+            writer.WriteEndElement();
+        }
 
+        internal static Slots
+            ReadSlots(XmlReader reader, string ns, string localName)
+        {
 
+            Slots slots = new Slots();
 
+            reader.MoveToContent();
+            bool isEmpty = reader.IsEmptyElement;
+            reader.ReadStartElement(localName, ns);
+            while (reader.IsStartElement("slot"))
+            {
+                reader.Read();
+                string key = reader.ReadElementString("key", Namespaces.Slot);
+
+                reader.MoveToContent();
+                string type = reader.GetAttribute("type");
+                object value;
+                if (type == "frame") // recursively call ourselves
+                {
+                    value = ReadSlots(reader, Namespaces.Slot, "value");
+                }
+                else
+                {
+                    value = reader.ReadElementString("value", Namespaces.Slot);
+                }
+                slots[key] = new Pair<string, object>(type, value);
+                reader.ReadEndElement();
+            }
+
+            if (!isEmpty) reader.ReadEndElement();
             return slots;
 
         }
-
 
 
         internal static string ReadOptionalElementString(XmlReader reader, string localName, string ns)

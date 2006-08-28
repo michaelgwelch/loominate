@@ -25,12 +25,14 @@ namespace Loominate.Engine
     using System.Xml;
     using System.Xml.Serialization;
 
+    using Slots = System.Collections.Generic.Dictionary<string, Pair<string, object>>;
+
     public class Account
     {
         public const string ElementName = "account";
         private const string Version = "2.0.0";
 
-        Dictionary<string, string> kvps;
+        Slots kvps;
 
 
         string accountName;
@@ -44,7 +46,8 @@ namespace Loominate.Engine
 
 
         public Account(String name, Guid id, String type, Commodity commodity,
-            int commodityScu, string code, string description, Guid parent, Dictionary<string, string> kvps)
+            int commodityScu, string code, string description,
+            Slots kvps, Guid parent)
         {
             this.accountName = name;
             this.id = id;
@@ -152,7 +155,7 @@ namespace Loominate.Engine
             {
                 if (kvps == null) return false;
                 if (kvps.ContainsKey("placeholder"))
-                    return bool.Parse(kvps["placeholder"]);
+                    return bool.Parse(kvps["placeholder"].Second as string);
 
                 return false;
             }
@@ -169,20 +172,20 @@ namespace Loominate.Engine
             writer.WriteElementString("type", Namespaces.Account, this.typeString);
             GnuCashXml.WriteCommodityId(writer, "commodity", Namespaces.Account, this.commodity);
             writer.WriteElementString("commodity-scu", Namespaces.Account, this.commodityScu.ToString());
-            writer.WriteElementString("description", Namespaces.Account, this.description);
-
-            if (IsPlaceholder)
-            {
-                writer.WriteStartElement("slots", Namespaces.Account);
-                writer.WriteStartElement("slot");
-                writer.WriteElementString("key", Namespaces.Slot, "placeholder");
-                writer.WriteStartElement("value", Namespaces.Slot);
-                writer.WriteAttributeString("type", "string");
-                writer.WriteValue("true");
-                writer.WriteEndElement(); // </value>
-                writer.WriteEndElement(); // </slot>
-                writer.WriteEndElement(); // </slots>
-            }
+            if (description != null) writer.WriteElementString("description", Namespaces.Account, this.description);
+            if (kvps != null) GnuCashXml.WriteSlots(writer, this.kvps, "slots", Namespaces.Account, false);
+            //if (IsPlaceholder)
+            //{
+            //    writer.WriteStartElement("slots", Namespaces.Account);
+            //    writer.WriteStartElement("slot");
+            //    writer.WriteElementString("key", Namespaces.Slot, "placeholder");
+            //    writer.WriteStartElement("value", Namespaces.Slot);
+            //    writer.WriteAttributeString("type", "string");
+            //    writer.WriteValue("true");
+            //    writer.WriteEndElement(); // </value>
+            //    writer.WriteEndElement(); // </slot>
+            //    writer.WriteEndElement(); // </slots>
+            //}
 
             if (parent != Guid.Empty)
                 GnuCashXml.WriteIdElement(writer, Namespaces.Account, parent, "parent");
@@ -208,10 +211,10 @@ namespace Loominate.Engine
             string nonstandardscu = GnuCashXml.ReadOptionalElementString(reader, "non-standard-scu", Namespaces.Account);
             string description = GnuCashXml.ReadOptionalElementString(reader, "description", Namespaces.Account);
 
-            Dictionary<string, string> slots = null;
+            Slots slots = null;
             if (reader.IsStartElement("slots", Namespaces.Account))
             {
-                slots = GnuCashXml.ReadSlots(reader, Namespaces.Account);
+                slots = GnuCashXml.ReadSlots(reader, Namespaces.Account, "slots");
             }
 
             Guid parent = new Guid();
@@ -228,7 +231,8 @@ namespace Loominate.Engine
 
             reader.ReadEndElement();
 
-            return new Account(name, id, type, c, int.Parse(commodityscu), code, description, parent, slots);
+            return new Account(name, id, type, c, int.Parse(commodityscu), code, 
+                description, slots, parent);
         }
 
 

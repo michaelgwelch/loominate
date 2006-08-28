@@ -21,15 +21,45 @@
 namespace Loominate.Engine
 {
     using System;
+    using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Slot 
+    public class Slot : IComparable<Slot>
     {
-        [XmlElement(Namespace=Namespaces.Slot, ElementName="key")]
-        public string Key;
-        
-        [XmlElement(Namespace=Namespaces.Slot, ElementName="value", DataType="string")]
-        public string Value;
+        string key;
+        object value;
+        string type;
 
+        public Slot(string key, object value, string type)
+        {
+            this.key = key;
+            this.type = type;
+            this.value = value;
+        }
+
+        public string Key
+        {
+            get { return this.key; }
+        }
+
+        public string Type
+        {
+            get { return this.type; }
+        }
+
+        public object Value
+        {
+            get { return this.value; }
+        }
+
+
+        #region IComparable<Slot> Members
+
+        public int CompareTo(Slot other)
+        {
+            return this.key.CompareTo(other.key);
+        }
+
+        #endregion
     }
 }
