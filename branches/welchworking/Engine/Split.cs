@@ -109,21 +109,21 @@ namespace Loominate.Engine
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteStartElement(ElementName, Namespaces.Transaction);
-            GnuCashXml.WriteIdElement(writer, Namespaces.Split, this.id);
-            if (memo != null) writer.WriteElementString("memo", Namespaces.Split, memo);
-            if (action != null) writer.WriteElementString("action", Namespaces.Split, action);
+            writer.WriteStartElement(ElementName, NameSpace.Transaction);
+            GnuCashXml.WriteIdElement(writer, NameSpace.Split, this.id);
+            if (memo != null) writer.WriteElementString("memo", NameSpace.Split, memo);
+            if (action != null) writer.WriteElementString("action", NameSpace.Split, action);
             string localName = "reconciled-state";
             switch (this.reconcileState)
             {
                 case ReconcileState.Reconciled:
-                    writer.WriteElementString(localName, Namespaces.Split, "y");
+                    writer.WriteElementString(localName, NameSpace.Split, "y");
                     break;
                 case ReconcileState.NotReconciled:
-                    writer.WriteElementString(localName, Namespaces.Split, "n");
+                    writer.WriteElementString(localName, NameSpace.Split, "n");
                     break;
                 case ReconcileState.Cleared:
-                    writer.WriteElementString(localName, Namespaces.Split, "c");
+                    writer.WriteElementString(localName, NameSpace.Split, "c");
                     break;
                 default:
                     throw new Exception();
@@ -131,47 +131,36 @@ namespace Loominate.Engine
 
             if (this.reconcileDate != null)
             {
-                GnuCashXml.WriteDate(writer, "reconcile-date", Namespaces.Split,
+                GnuCashXml.WriteDate(writer, "reconcile-date", NameSpace.Split,
                 (DateTime)this.reconcileDate);
             }
-            writer.WriteElementString("value", Namespaces.Split,
+            writer.WriteElementString("value", NameSpace.Split,
                 FormatGnumeric(this.value, this.valueFraction));
-            writer.WriteElementString("quantity", Namespaces.Split,
+            writer.WriteElementString("quantity", NameSpace.Split,
                 FormatGnumeric(this.quantity, this.qtyFraction));
-            GnuCashXml.WriteIdElement(writer, Namespaces.Split, accountId, "account");
+            GnuCashXml.WriteIdElement(writer, NameSpace.Split, accountId, "account");
             writer.WriteEndElement(); // </split>
         }
-        public static Split ReadXml(XmlReader reader)
+        internal static Split ReadXml(XmlGnuCashReader reader)
         {
-            reader.ReadStartElement(ElementName, Namespaces.Transaction);
+            reader.ReadStartElement(ElementName, NameSpace.Transaction);
 
-            Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Split);
-            string memo = GnuCashXml.ReadOptionalElementString(reader, "memo", Namespaces.Split);
-            string action = GnuCashXml.ReadOptionalElementString(reader, "action", Namespaces.Split);
-            string reconcileString = reader.ReadElementString("reconciled-state", Namespaces.Split);
-            ReconcileState reconcileState;
-            switch (reconcileString)
+            using (DefaultNameSpace.Set(NameSpace.Split))
             {
-                case "y":
-                    reconcileState = ReconcileState.Reconciled;
-                    break;
-                case "n":
-                    reconcileState = ReconcileState.NotReconciled;
-                    break;
-                case "c":
-                    reconcileState = ReconcileState.Cleared;
-                    break;
-                default:
-                    throw new XmlException("Expected a valid reconcile state");
+                Guid id = reader.ReadIdElement();
+                string memo = reader.ReadOptionalString("memo");
+                string action = reader.ReadOptionalString("action");
+                ReconcileState reconcileState = reader.ReadReconcileState();
+
+                DateTime? reconcileDate = reader.ReadOptionalDate("reconcile-date");
+                string value = reader.ReadOptionalString("value");
+                string qty = reader.ReadString("quantity");
+
+                Guid accountId = reader.ReadIdElement("account");
+
+                reader.ReadEndElement(); // </split>
+                return new Split(id, memo, action, reconcileDate, reconcileState, ParseGnumeric(value), ParseGnumeric(qty), accountId);
             }
-
-            DateTime? reconcileDate = GnuCashXml.ReadDate(reader, "reconcile-date", Namespaces.Split);
-            string value = GnuCashXml.ReadOptionalElementString(reader, "value", Namespaces.Split);
-            string qty = reader.ReadElementString("quantity", Namespaces.Split);
-
-            Guid accountId = GnuCashXml.ReadIdElement(reader, Namespaces.Split, "account");
-            reader.ReadEndElement(); // </split>
-            return new Split(id, memo, action, reconcileDate, reconcileState, ParseGnumeric(value), ParseGnumeric(qty), accountId);
         }
 
         /// <summary>

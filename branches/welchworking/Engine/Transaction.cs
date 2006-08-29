@@ -76,45 +76,45 @@ namespace Loominate.Engine
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteStartElement(ElementName, Namespaces.GnuCash);
+            writer.WriteStartElement(ElementName, NameSpace.GnuCash);
             writer.WriteAttributeString("version", version);
-            GnuCashXml.WriteIdElement(writer, Namespaces.Transaction, this.id);
-            GnuCashXml.WriteCommodityId(writer, "currency", Namespaces.Transaction, this.commodity);
-            if (num != null) writer.WriteElementString("num", Namespaces.Transaction, this.num);
+            GnuCashXml.WriteIdElement(writer, NameSpace.Transaction, this.id);
+            GnuCashXml.WriteCommodityId(writer, "currency", NameSpace.Transaction, this.commodity);
+            if (num != null) writer.WriteElementString("num", NameSpace.Transaction, this.num);
             WriteDatePosted(writer);
             WriteDateEntered(writer);
-            GnuCashXml.WriteElementString(writer, "description", Namespaces.Transaction, description);
-            if (this.kvps != null) GnuCashXml.WriteSlots(writer, this.kvps, "slots", Namespaces.Transaction, false);
-            writer.WriteStartElement("splits", Namespaces.Transaction);
+            GnuCashXml.WriteElementString(writer, "description", NameSpace.Transaction, description);
+            if (this.kvps != null) GnuCashXml.WriteSlots(writer, this.kvps, "slots", NameSpace.Transaction, false);
+            writer.WriteStartElement("splits", NameSpace.Transaction);
             foreach (Split split in splits) split.WriteXml(writer);
             writer.WriteEndElement(); // </splits>
             writer.WriteEndElement(); // </transaction>
         }
 
-        public static Transaction ReadXml(XmlReader reader, Dictionary<string, Commodity> commodities)
+        internal static Transaction ReadXml(XmlGnuCashReader reader, Dictionary<string, Commodity> commodities)
         {
-            if (!reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected transaction");
+            if (!reader.IsStartElement(ElementName, NameSpace.GnuCash)) throw new XmlException("Expected transaction");
             if (reader.GetAttribute("version") != version) throw new XmlException("Expected transaction to be version " + version);
 
             reader.Read(); // reads start element
 
-            Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Transaction);
-            Commodity c = GnuCashXml.GetCommodity(reader, "currency", Namespaces.Transaction, commodities);
-            string num = GnuCashXml.ReadOptionalElementString(reader, "num", Namespaces.Transaction);
+            Guid id = GnuCashXml.ReadIdElement(reader, NameSpace.Transaction);
+            Commodity c = GnuCashXml.GetCommodity(reader, "currency", NameSpace.Transaction, commodities);
+            string num = GnuCashXml.ReadOptionalElementString(reader, "num", NameSpace.Transaction);
 
             DateTime posted = ReadDatePosted(reader);
             Pair<DateTime, int?> entered = ReadDateEntered(reader);
-            string description = reader.ReadElementString("description", Namespaces.Transaction);
+            string description = reader.ReadElementString("description", NameSpace.Transaction);
 
             Slots kvps = null;
-            if (reader.IsStartElement("slots", Namespaces.Transaction))
+            if (reader.IsStartElement("slots", NameSpace.Transaction))
             {
-                kvps = GnuCashXml.ReadSlots(reader, Namespaces.Transaction, "slots");
+                kvps = GnuCashXml.ReadSlots(reader, NameSpace.Transaction, "slots");
             }
 
             SplitList splits = new SplitList();
-            reader.ReadStartElement("splits", Namespaces.Transaction);
-            while (reader.IsStartElement(Split.ElementName, Namespaces.Transaction))
+            reader.ReadStartElement("splits", NameSpace.Transaction);
+            while (reader.IsStartElement(Split.ElementName, NameSpace.Transaction))
             {
                 splits.Add(Split.ReadXml(reader));
             }
@@ -127,32 +127,32 @@ namespace Loominate.Engine
 
         private void WriteDatePosted(XmlWriter writer)
         {
-            GnuCashXml.WriteDate(writer, "date-posted", Namespaces.Transaction,
+            GnuCashXml.WriteDate(writer, "date-posted", NameSpace.Transaction,
                 datePosted);
         }
 
         private static DateTime ReadDatePosted(XmlReader reader)
         {
-            return (DateTime) GnuCashXml.ReadDate(reader, "date-posted", Namespaces.Transaction);
+            return (DateTime) GnuCashXml.ReadDate(reader, "date-posted", NameSpace.Transaction);
         }
 
 
         private void WriteDateEntered(XmlWriter writer)
         {
             string localName = "date-entered";
-            string ns = Namespaces.Transaction;
+            string ns = NameSpace.Transaction;
             writer.WriteStartElement(localName, ns);
             writer.WriteElementString("date",
-                Namespaces.Timestamp, FormatDateTime(dateEntered.First));
-            if (dateEntered.Second != null) writer.WriteElementString("ns", Namespaces.Timestamp, dateEntered.Second.ToString());
+                NameSpace.Timestamp, FormatDateTime(dateEntered.First));
+            if (dateEntered.Second != null) writer.WriteElementString("ns", NameSpace.Timestamp, dateEntered.Second.ToString());
             writer.WriteEndElement();
         }
 
         private static Pair<DateTime, int?> ReadDateEntered(XmlReader reader)
         {
-            reader.ReadStartElement("date-entered", Namespaces.Transaction);
-            DateTime entered = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
-            string nsString = GnuCashXml.ReadOptionalElementString(reader, "ns", Namespaces.Timestamp);
+            reader.ReadStartElement("date-entered", NameSpace.Transaction);
+            DateTime entered = DateTime.Parse(reader.ReadElementString("date", NameSpace.Timestamp));
+            string nsString = GnuCashXml.ReadOptionalElementString(reader, "ns", NameSpace.Timestamp);
             int? ns = (nsString == null) ? (int?)null : int.Parse(nsString);
             reader.ReadEndElement();
             return new Pair<DateTime, int?>(entered, ns);

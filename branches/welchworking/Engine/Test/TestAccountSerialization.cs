@@ -69,10 +69,10 @@ namespace Loominate.Engine
             StringBuilder bldr = new StringBuilder();
             XmlWriter writer = XmlWriterFactory.Create(bldr);
             XmlSerializerNamespaces nms = new XmlSerializerNamespaces();
-            nms.Add("gnc", Namespaces.GnuCash);
-            nms.Add("act", Namespaces.Account);
-            nms.Add("cmdty", Namespaces.Commodity);
-            nms.Add("slot", Namespaces.Slot);
+            nms.Add("gnc", NameSpace.GnuCash);
+            nms.Add("act", NameSpace.Account);
+            nms.Add("cmdty", NameSpace.Commodity);
+            nms.Add("slot", NameSpace.Slot);
             s.Serialize(writer, a, nms);
             string newXml = bldr.ToString();
             Console.WriteLine(newXml);

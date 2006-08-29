@@ -156,37 +156,37 @@ namespace Loominate.Engine
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteStartElement(ElementName, Namespaces.GnuCash);
+            writer.WriteStartElement(ElementName, NameSpace.GnuCash);
             writer.WriteAttributeString("version", version);
-            writer.WriteElementString("space", Namespaces.Commodity, this.nameSpace);
-            writer.WriteElementString("id", Namespaces.Commodity, this.mnemonic);
-            writer.WriteElementString("name", Namespaces.Commodity, this.fullName);
-            if (cusip != null) writer.WriteElementString("xcode", Namespaces.Commodity, this.cusip);
-            writer.WriteElementString("fraction", Namespaces.Commodity, this.fraction.ToString());
-            if (getQuotes != null) writer.WriteElementString("get_quotes", Namespaces.Commodity, this.getQuotes);
-            if (quoteSource != null) writer.WriteElementString("quote_source", Namespaces.Commodity, this.quoteSource);
-            if (quoteTz != null) writer.WriteElementString("quote_tz", Namespaces.Commodity, this.quoteTz);
+            writer.WriteElementString("space", NameSpace.Commodity, this.nameSpace);
+            writer.WriteElementString("id", NameSpace.Commodity, this.mnemonic);
+            writer.WriteElementString("name", NameSpace.Commodity, this.fullName);
+            if (cusip != null) writer.WriteElementString("xcode", NameSpace.Commodity, this.cusip);
+            writer.WriteElementString("fraction", NameSpace.Commodity, this.fraction.ToString());
+            if (getQuotes != null) writer.WriteElementString("get_quotes", NameSpace.Commodity, this.getQuotes);
+            if (quoteSource != null) writer.WriteElementString("quote_source", NameSpace.Commodity, this.quoteSource);
+            if (quoteTz != null) writer.WriteElementString("quote_tz", NameSpace.Commodity, this.quoteTz);
 
             writer.WriteEndElement();
         }
 
-        public static Commodity ReadXml(XmlReader reader)
+        internal static Commodity ReadXml(XmlGnuCashReader reader)
         {
             reader.MoveToContent();
 
-            if (!reader.IsStartElement(ElementName, Namespaces.GnuCash)) throw new XmlException("Expected commodity");
+            if (!reader.IsStartElement(ElementName, NameSpace.GnuCash)) throw new XmlException("Expected commodity");
             if (reader.GetAttribute("version") != version) throw new XmlException("Expected commodity to be at version " + version);
 
-            reader.ReadStartElement(ElementName, Namespaces.GnuCash);
+            reader.ReadStartElement(ElementName, NameSpace.GnuCash);
             
-            string ns = reader.ReadElementString("space", Namespaces.Commodity);
-            string id = reader.ReadElementString("id", Namespaces.Commodity);
-            string name = reader.ReadElementString("name", Namespaces.Commodity);
-            string xcode = GnuCashXml.ReadOptionalElementString(reader, "xcode", Namespaces.Commodity);
-            string fraction = reader.ReadElementString("fraction", Namespaces.Commodity);
-            string get_quotes = GnuCashXml.ReadOptionalElementString(reader, "get_quotes", Namespaces.Commodity);
-            string quote_source = GnuCashXml.ReadOptionalElementString(reader, "quote_source", Namespaces.Commodity);
-            string quote_tz = GnuCashXml.ReadOptionalElementString(reader, "quote_tz", Namespaces.Commodity);
+            string ns = reader.ReadElementString("space", NameSpace.Commodity);
+            string id = reader.ReadElementString("id", NameSpace.Commodity);
+            string name = reader.ReadElementString("name", NameSpace.Commodity);
+            string xcode = GnuCashXml.ReadOptionalElementString(reader, "xcode", NameSpace.Commodity);
+            string fraction = reader.ReadElementString("fraction", NameSpace.Commodity);
+            string get_quotes = GnuCashXml.ReadOptionalElementString(reader, "get_quotes", NameSpace.Commodity);
+            string quote_source = GnuCashXml.ReadOptionalElementString(reader, "quote_source", NameSpace.Commodity);
+            string quote_tz = GnuCashXml.ReadOptionalElementString(reader, "quote_tz", NameSpace.Commodity);
 
             /*
              *   <cmdty:get_quotes/>

@@ -38,7 +38,7 @@ namespace Loominate.Engine
         [Test]
         public void TestOne()
         {
-            XmlReader reader = XmlReaderFactory.CreateReader(xml);
+            XmlGnuCashReader reader = XmlReaderFactory.CreateReader(xml);
             Split s = Split.ReadXml(reader);
 
             Assert.IsNotNull(s);

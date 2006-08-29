@@ -97,7 +97,7 @@ namespace Loominate.Engine
 
         internal static int ReadCountData(XmlReader reader, CountDataType type)
         {
-            int? result = ReadCountDataOptional(reader, type);
+            int? result = ReadOptionalCountData(reader, type);
             if (result == null)
                 throw new XmlException("Expected to find count-data");
             return (int) result;
@@ -111,7 +111,7 @@ namespace Loominate.Engine
             if (value != null)
             {
                 writer.WriteStartElement(countDataElementName, ns);
-                writer.WriteAttributeString("type", Namespaces.CountData,
+                writer.WriteAttributeString("type", NameSpace.CountData,
                     countDataTypeToString[type]);
                 writer.WriteValue(value.ToString());
                 writer.WriteEndElement(); 
@@ -122,15 +122,15 @@ namespace Loominate.Engine
 
         internal static void WriteNamespaces(XmlWriter writer)
         {
-            WriteNamespace(writer, "gnc", Namespaces.GnuCash);
-            WriteNamespace(writer, "act", Namespaces.Account);
-            WriteNamespace(writer, "book", Namespaces.Book);
-            WriteNamespace(writer, "cd", Namespaces.CountData);
-            WriteNamespace(writer, "cmdty", Namespaces.Commodity);
-            WriteNamespace(writer, "slot", Namespaces.Slot);
-            WriteNamespace(writer, "split", Namespaces.Split);
-            WriteNamespace(writer, "trn", Namespaces.Transaction);
-            WriteNamespace(writer, "ts", Namespaces.Timestamp);
+            WriteNamespace(writer, "gnc", NameSpace.GnuCash);
+            WriteNamespace(writer, "act", NameSpace.Account);
+            WriteNamespace(writer, "book", NameSpace.Book);
+            WriteNamespace(writer, "cd", NameSpace.CountData);
+            WriteNamespace(writer, "cmdty", NameSpace.Commodity);
+            WriteNamespace(writer, "slot", NameSpace.Slot);
+            WriteNamespace(writer, "split", NameSpace.Split);
+            WriteNamespace(writer, "trn", NameSpace.Transaction);
+            WriteNamespace(writer, "ts", NameSpace.Timestamp);
 
             /*
              *      xmlns:gnc="http://www.gnucash.org/XML/gnc"
@@ -181,13 +181,13 @@ namespace Loominate.Engine
         /// <param name="reader"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal static int? ReadCountDataOptional(XmlReader reader, CountDataType type)
+        internal static int? ReadOptionalCountData(XmlReader reader, CountDataType type)
         {
             reader.MoveToContent();
             // if this isn't a count-data element then return -1, it's possible this
             // was an optional instance of this element. Let the caller sort it out.
 
-            if (!reader.IsStartElement(countDataElementName, Namespaces.GnuCash)) 
+            if (!reader.IsStartElement(countDataElementName, NameSpace.GnuCash)) 
                 return null;
 
 
@@ -198,37 +198,34 @@ namespace Loominate.Engine
 
             string expectedType = countDataTypeToString[type];
 
-            string actualType = reader.GetAttribute("type", Namespaces.CountData);
+            string actualType = reader.GetAttribute("type", NameSpace.CountData);
 
             if (expectedType != actualType) return null;
 
 
 
-            string val = reader.ReadElementString(countDataElementName, Namespaces.GnuCash);
+            string val = reader.ReadElementString(countDataElementName, NameSpace.GnuCash);
 
             return int.Parse(val);
 
         }
 
 
+        internal static Guid ReadIdElement(XmlReader reader, string ns, string localName)
+        {
+            string idString = reader.ReadElementString(localName, ns);
+            return new Guid(idString);
+        }
 
         /// <summary>
-
         /// Helper method to read id elements. These always have the same structure but a different namespace,
-
         /// so the namespace must be specified.
-
         /// </summary>
-
         /// <param name="ns">The namespace of the expected id element</param>
-
         /// <returns></returns>
-
         internal static Guid ReadIdElement(XmlReader reader, string ns)
         {
-
             return ReadIdElement(reader, ns, "id");
-
         }
 
 
@@ -261,23 +258,14 @@ namespace Loominate.Engine
 
 
 
-        internal static Guid ReadIdElement(XmlReader reader, string ns, string localName)
-        {
 
-            reader.MoveToContent();
-
-            string idString = reader.ReadElementString(localName, ns);
-
-            return new Guid(idString);
-
-        }
 
         internal static DateTime? ReadDate(XmlReader reader, string localName, string ns)
         {
             if (reader.IsStartElement(localName, ns))
             {
                 reader.Read();
-                DateTime date = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
+                DateTime date = DateTime.Parse(reader.ReadElementString("date", NameSpace.Timestamp));
                 reader.ReadEndElement();
                 return date;
             }
@@ -297,16 +285,16 @@ namespace Loominate.Engine
                 SlotValuePair value = slot.Value;
                 string type = value.First;
                 writer.WriteStartElement("slot");
-                writer.WriteElementString("key", Namespaces.Slot, key);
+                writer.WriteElementString("key", NameSpace.Slot, key);
 
                 if (type == "frame")
                 {
                     WriteSlots(writer, value.Second as Slots,
-                        "value", Namespaces.Slot, true);
+                        "value", NameSpace.Slot, true);
                 }
                 else
                 {
-                    writer.WriteStartElement("value", Namespaces.Slot);
+                    writer.WriteStartElement("value", NameSpace.Slot);
                     writer.WriteAttributeString("type", type);
                     writer.WriteString(value.Second.ToString());
                     writer.WriteEndElement(); // </value>
@@ -330,18 +318,18 @@ namespace Loominate.Engine
             while (reader.IsStartElement("slot"))
             {
                 reader.Read();
-                string key = reader.ReadElementString("key", Namespaces.Slot);
+                string key = reader.ReadElementString("key", NameSpace.Slot);
 
                 reader.MoveToContent();
                 string type = reader.GetAttribute("type");
                 object value;
                 if (type == "frame") // recursively call ourselves
                 {
-                    value = ReadSlots(reader, Namespaces.Slot, "value");
+                    value = ReadSlots(reader, NameSpace.Slot, "value");
                 }
                 else
                 {
-                    value = reader.ReadElementString("value", Namespaces.Slot);
+                    value = reader.ReadElementString("value", NameSpace.Slot);
                 }
                 slots[key] = new Pair<string, object>(type, value);
                 reader.ReadEndElement();
@@ -355,11 +343,8 @@ namespace Loominate.Engine
 
         internal static string ReadOptionalElementString(XmlReader reader, string localName, string ns)
         {
-
             if (reader.IsStartElement(localName, ns)) return reader.ReadElementString();
-
             return null;
-
         }
 
 
@@ -385,8 +370,8 @@ namespace Loominate.Engine
         internal static Commodity GetCommodity(XmlReader reader, string localName, string ns, Dictionary<string, Commodity> commodities)
         {
             reader.ReadStartElement(localName, ns);
-            string commodityns = reader.ReadElementString("space", Namespaces.Commodity);
-            string commodityid = reader.ReadElementString("id", Namespaces.Commodity);
+            string commodityns = reader.ReadElementString("space", NameSpace.Commodity);
+            string commodityid = reader.ReadElementString("id", NameSpace.Commodity);
             string uniqueId = Commodity.CreateUniqueName(commodityns, commodityid);
             Commodity c = commodities[uniqueId];
             reader.ReadEndElement();
@@ -398,8 +383,8 @@ namespace Loominate.Engine
         internal static void WriteCommodityId(XmlWriter writer, string localName, string ns, Commodity c)
         {
             writer.WriteStartElement(localName, ns);
-            writer.WriteElementString("space", Namespaces.Commodity, c.Namespace);
-            writer.WriteElementString("id", Namespaces.Commodity, c.Mnemonic);
+            writer.WriteElementString("space", NameSpace.Commodity, c.Namespace);
+            writer.WriteElementString("id", NameSpace.Commodity, c.Mnemonic);
             writer.WriteEndElement();
         }
 
@@ -408,7 +393,7 @@ namespace Loominate.Engine
         {
             writer.WriteStartElement(localName, ns);
             writer.WriteElementString("date",
-                Namespaces.Timestamp, FormatDateTime(value));
+                NameSpace.Timestamp, FormatDateTime(value));
             writer.WriteEndElement();
         }
 

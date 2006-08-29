@@ -47,7 +47,7 @@ namespace Loominate.Engine
 
             writer.WriteStartElement(ElementName);
             GnuCashXml.WriteNamespaces(writer);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Book, books.Length);
             this.books[0].WriteXml(writer);
 
@@ -63,16 +63,17 @@ namespace Loominate.Engine
         /// <returns></returns>
         public static GnuCashFile ReadXmlStream(Stream stream)
         {
-            XmlReader reader = new XmlTextReader(stream);
-            reader.MoveToContent();
+            XmlGnuCashReader reader = new XmlGnuCashReader(stream);
+
             reader.ReadStartElement(ElementName);
 
-            int numOfBooks = GnuCashXml.ReadCountData(reader, CountDataType.Book);
+            int numOfBooks = reader.ReadCountData(CountDataType.Book);
+
             Book[] books = new Book[numOfBooks];
 
             for (int i = 0; i < numOfBooks; i++)
             {
-                books[i] = Book.ReadXml(reader);
+                books[i] = reader.ReadBook();
             }
 
             return new GnuCashFile(books);

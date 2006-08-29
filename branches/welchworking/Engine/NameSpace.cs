@@ -20,19 +20,48 @@
 
 namespace Loominate.Engine
 {
-    internal static class Namespaces
+    internal class NameSpace
     {
-        public const string GnuCash="http://www.gnucash.org/XML/gnc";
-        public const string Account = "http://www.gnucash.org/XML/act";
-        public const string Book = "http://www.gnucash.org/XML/book";
-        public const string CountData = "http://www.gnucash.org/XML/cd";
-        public const string Commodity = "http://www.gnucash.org/XML/cmdty";
-        public const string Price = "http://www.gnucash.org/XML/price";
-        public const string Slot = "http://www.gnucash.org/XML/slot";
-        public const string Split = "http://www.gnucash.org/XML/split";
-        public const string ScheduledTransaction = "http://www.gnucash.org/XML/sx";
-        public const string Transaction = "http://www.gnucash.org/XML/trn";
-        public const string Timestamp = "http://www.gnucash.org/XML/ts";
+        private const string gnuCash="http://www.gnucash.org/XML/gnc";
+        private const string account = "http://www.gnucash.org/XML/act";
+        private const string book = "http://www.gnucash.org/XML/book";
+        private const string countData = "http://www.gnucash.org/XML/cd";
+        private const string commodity = "http://www.gnucash.org/XML/cmdty";
+        private const string price = "http://www.gnucash.org/XML/price";
+        private const string slot = "http://www.gnucash.org/XML/slot";
+        private const string split = "http://www.gnucash.org/XML/split";
+        private const string scheduledTransaction = "http://www.gnucash.org/XML/sx";
+        private const string transaction = "http://www.gnucash.org/XML/trn";
+        private const string timestamp = "http://www.gnucash.org/XML/ts";
+
+        public static NameSpace GnuCash = new NameSpace(gnuCash);
+        public static NameSpace Account = new NameSpace(account);
+        public static NameSpace Book = new NameSpace(book);
+        public static NameSpace CountData = new NameSpace(countData);
+        public static NameSpace Commodity = new NameSpace(commodity);
+        public static NameSpace Price = new NameSpace(price);
+        public static NameSpace Slot = new NameSpace(slot);
+        public static NameSpace Split = new NameSpace(split);
+        public static NameSpace ScheduledTransaction = new NameSpace(scheduledTransaction);
+        public static NameSpace Transaction = new NameSpace(transaction);
+        public static NameSpace Timestamp = new NameSpace(timestamp);
+
+        private string val;
+
+        private NameSpace(string ns)
+        {
+            val = ns;
+        }
+
+        public static implicit operator string(NameSpace ns)
+        {
+            return ns.val;
+        }
+
+        public override string ToString()
+        {
+            return val;
+        }
 
 
 /* 

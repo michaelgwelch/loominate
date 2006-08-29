@@ -42,9 +42,12 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Book.cs" />
     <Compile Include="CountDataType.cs" />
+    <Compile Include="DefaultNameSpace.cs" />
     <Compile Include="GnuCashFile.cs" />
     <Compile Include="GnuCashXml.cs" />
-    <Compile Include="Namespaces.cs" />
+    <Compile Include="NameSpace.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Pair.cs" />
     <Compile Include="ReconcileState.cs" />
     <Compile Include="Test\TestAccountSerialization.cs" />
@@ -54,7 +57,6 @@
     <Compile Include="Test\XmlWriterFactory.cs" />
     <Compile Include="Transaction.cs" />
     <Compile Include="Account.cs" />
-    <Compile Include="AccountGroup.cs" />
     <Compile Include="AccountType.cs" />
     <Compile Include="Commodity.cs" />
     <Compile Include="Lot.cs" />
@@ -63,6 +65,7 @@
     <Compile Include="Test\TestCommodity.cs" />
     <Compile Include="Test\TestSplit.cs" />
     <Compile Include="Test\TestCommoditySerialization.cs" />
+    <Compile Include="XmlGnuCashReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="COPYING" />
