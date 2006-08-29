@@ -30,21 +30,22 @@ namespace Loominate.Engine
     // The reader is pre-populated with appropriate namespaces.
     public static class XmlReaderFactory
     {
-        internal static XmlReader CreateReader(string xml)
+        internal static XmlGnuCashReader CreateReader(string xml)
         {
             NameTable tbl = new NameTable();
             XmlNamespaceManager mgr = new XmlNamespaceManager(tbl);
-            mgr.AddNamespace("gnc", Namespaces.GnuCash);
-            mgr.AddNamespace("act", Namespaces.Account);
-            mgr.AddNamespace("cmdty", Namespaces.Commodity);
-            mgr.AddNamespace("slot", Namespaces.Slot);
-            mgr.AddNamespace("trn", Namespaces.Transaction);
-            mgr.AddNamespace("split", Namespaces.Split);
+            mgr.AddNamespace("gnc", NameSpace.GnuCash);
+            mgr.AddNamespace("act", NameSpace.Account);
+            mgr.AddNamespace("cmdty", NameSpace.Commodity);
+            mgr.AddNamespace("slot", NameSpace.Slot);
+            mgr.AddNamespace("trn", NameSpace.Transaction);
+            mgr.AddNamespace("split", NameSpace.Split);
             XmlParserContext context = new XmlParserContext(tbl, mgr, null, XmlSpace.Default);
 
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.ConformanceLevel = ConformanceLevel.Fragment;
-            return XmlReader.Create(new StringReader(xml), settings, context);
+            //return XmlReader.Create(new StringReader(xml), settings, context);
+            return new XmlGnuCashReader(null);
         }
 
     }

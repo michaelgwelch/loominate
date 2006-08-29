@@ -65,7 +65,7 @@ namespace Loominate.Engine
         [Test]
         public void TestOne()
         {
-            XmlReader reader = XmlReaderFactory.CreateReader(xml);
+            XmlGnuCashReader reader = XmlReaderFactory.CreateReader(xml);
             Dictionary<string, Commodity> commodities = null;
 
             Commodity c = new Commodity("US Dollar", "ISO4217", "USD", "840", 100, String.Empty, "currency", String.Empty);

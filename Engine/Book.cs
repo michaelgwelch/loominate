@@ -82,29 +82,29 @@ namespace Loominate.Engine
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteStartElement(ElementName, Namespaces.GnuCash);
+            writer.WriteStartElement(ElementName, NameSpace.GnuCash);
             writer.WriteAttributeString("version", "", VersionXml);
-            GnuCashXml.WriteIdElement(writer, Namespaces.Book, this.id);
-            GnuCashXml.WriteSlots(writer, slots, "slots", Namespaces.Book, false);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteIdElement(writer, NameSpace.Book, this.id);
+            GnuCashXml.WriteSlots(writer, slots, "slots", NameSpace.Book, false);
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Commodity, comms);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Account, accts);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Transaction, trans);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.ScheduledTransaction, strans);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Budget, budgts);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Customer, custs);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Employee, emps);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.BillTerm, terms);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Invoice, invcs);
-            GnuCashXml.WriteCountData(writer, Namespaces.GnuCash,
+            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
                 CountDataType.Entry, entrs);
             foreach (KeyValuePair<string, Commodity> kvp in commodities) kvp.Value.WriteXml(writer);
             foreach (Account account in accounts) account.WriteXml(writer);
@@ -112,36 +112,32 @@ namespace Loominate.Engine
             writer.WriteEndElement();
         }
 
-        public static Book ReadXml(XmlReader reader)
+        internal static Book ReadXml(XmlGnuCashReader reader)
         {
-            reader.MoveToContent();
-            if ( ! reader.IsStartElement(ElementName, Namespaces.GnuCash))
+            if ( ! reader.IsStartElement(ElementName, NameSpace.GnuCash))
                 throw new XmlException("Expected the start of a book element");
 
             if (reader.GetAttribute("version") != VersionXml)
                 throw new XmlException("Expected book element to be at version " + VersionXml);
 
-            reader.ReadStartElement(ElementName, Namespaces.GnuCash);
+            reader.ReadStartElement(ElementName, NameSpace.GnuCash);
 
-            Guid id = GnuCashXml.ReadIdElement(reader, Namespaces.Book);
+            Guid id = reader.ReadIdElement(NameSpace.Book);
+            Slots slots = reader.ReadOptionalSlots("slots", NameSpace.Book);
 
-            Slots slots = null;
-            if (reader.IsStartElement("slots", Namespaces.Book)) {
-                slots = GnuCashXml.ReadSlots(reader, Namespaces.Book, "slots");
-            }
 
             // Note: All of the following except numOfAccounts and numOfTransactions is required.
             // Notice the use of ReadCountData for them instead of ReadCountDataOptional.
-            int? numOfCommodities = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Commodity);
-            int numOfAccounts = GnuCashXml.ReadCountData(reader, CountDataType.Account);
-            int numOfTransactions = GnuCashXml.ReadCountData(reader, CountDataType.Transaction);
-            int? numOfScheduledTrans = GnuCashXml.ReadCountDataOptional(reader, CountDataType.ScheduledTransaction);
-            int? numOfBudgets = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Budget);
-            int? numOfCustomers = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Customer);
-            int? numOfEmployees = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Employee);
-            int? numOfBillTerms = GnuCashXml.ReadCountDataOptional(reader, CountDataType.BillTerm);
-            int? numOfInvoices = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Invoice);
-            int? numOfEntries = GnuCashXml.ReadCountDataOptional(reader, CountDataType.Entry);
+            int? numOfCommodities = reader.ReadOptionalCountData(CountDataType.Commodity);
+            int numOfAccounts = reader.ReadCountData(CountDataType.Account);
+            int numOfTransactions = reader.ReadCountData(CountDataType.Transaction);
+            int? numOfScheduledTrans = reader.ReadOptionalCountData(CountDataType.ScheduledTransaction);
+            int? numOfBudgets = reader.ReadOptionalCountData(CountDataType.Budget);
+            int? numOfCustomers = reader.ReadOptionalCountData(CountDataType.Customer);
+            int? numOfEmployees = reader.ReadOptionalCountData(CountDataType.Employee);
+            int? numOfBillTerms = reader.ReadOptionalCountData(CountDataType.BillTerm);
+            int? numOfInvoices = reader.ReadOptionalCountData(CountDataType.Invoice);
+            int? numOfEntries = reader.ReadOptionalCountData(CountDataType.Entry);
 
             CommodityDictionary commodities = new CommodityDictionary();
             ReadCommodities(reader, commodities);
@@ -161,29 +157,29 @@ namespace Loominate.Engine
 
         }
 
-        private static void ReadCommodities(XmlReader reader, CommodityDictionary commodities)
+        private static void ReadCommodities(XmlGnuCashReader reader, CommodityDictionary commodities)
         {
-            while (reader.IsStartElement(Commodity.ElementName, Namespaces.GnuCash))
+            while (reader.IsStartElement(Commodity.ElementName, NameSpace.GnuCash))
             {
                 Commodity c = Commodity.ReadXml(reader);
                 commodities[c.UniqueName] = c;
             }
         }
 
-        private static void ReadAccounts(XmlReader reader, AccountList accounts,
+        private static void ReadAccounts(XmlGnuCashReader reader, AccountList accounts,
             CommodityDictionary commodities)
         {
-            while (reader.IsStartElement(Account.ElementName, Namespaces.GnuCash))
+            while (reader.IsStartElement(Account.ElementName, NameSpace.GnuCash))
             {
                 Account a = Account.ReadXml(reader, commodities);
                 accounts.Add(a);
             }
         }
 
-        private static void ReadTransactions(XmlReader reader, TransactionList transactions,
+        private static void ReadTransactions(XmlGnuCashReader reader, TransactionList transactions,
             CommodityDictionary commodities)
         {
-            while (reader.IsStartElement(Transaction.ElementName, Namespaces.GnuCash))
+            while (reader.IsStartElement(Transaction.ElementName, NameSpace.GnuCash))
             {
                 transactions.Add(Transaction.ReadXml(reader, commodities));
             }
