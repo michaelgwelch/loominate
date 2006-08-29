@@ -47,8 +47,8 @@ namespace Loominate.Engine
 
         Guid accountId;
 
-        public Split(Guid id, string memo, string action, 
-            DateTime? reconcileDate, ReconcileState reconcileState, 
+        public Split(Guid id, string memo, string action,
+            DateTime? reconcileDate, ReconcileState reconcileState,
             Pair<decimal, int> value, Pair<decimal, int> quantity,
             Guid accountId)
         {
@@ -111,6 +111,8 @@ namespace Loominate.Engine
         {
             writer.WriteStartElement(ElementName, Namespaces.Transaction);
             GnuCashXml.WriteIdElement(writer, Namespaces.Split, this.id);
+            if (memo != null) writer.WriteElementString("memo", Namespaces.Split, memo);
+            if (action != null) writer.WriteElementString("action", Namespaces.Split, action);
             string localName = "reconciled-state";
             switch (this.reconcileState)
             {
@@ -126,9 +128,15 @@ namespace Loominate.Engine
                 default:
                     throw new Exception();
             }
-            writer.WriteElementString("value", Namespaces.Split, 
+
+            if (this.reconcileDate != null)
+            {
+                GnuCashXml.WriteDate(writer, "reconcile-date", Namespaces.Split,
+                (DateTime)this.reconcileDate);
+            }
+            writer.WriteElementString("value", Namespaces.Split,
                 FormatGnumeric(this.value, this.valueFraction));
-            writer.WriteElementString("quantity", Namespaces.Split, 
+            writer.WriteElementString("quantity", Namespaces.Split,
                 FormatGnumeric(this.quantity, this.qtyFraction));
             GnuCashXml.WriteIdElement(writer, Namespaces.Split, accountId, "account");
             writer.WriteEndElement(); // </split>
@@ -185,7 +193,7 @@ namespace Loominate.Engine
 
         private static string FormatGnumeric(decimal value, int fraction)
         {
-            return (value * fraction).ToString() + "/" + fraction.ToString();
+            return ((int)(value * fraction)).ToString() + "/" + fraction.ToString();
         }
     }
 }

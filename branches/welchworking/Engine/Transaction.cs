@@ -80,9 +80,11 @@ namespace Loominate.Engine
             writer.WriteAttributeString("version", version);
             GnuCashXml.WriteIdElement(writer, Namespaces.Transaction, this.id);
             GnuCashXml.WriteCommodityId(writer, "currency", Namespaces.Transaction, this.commodity);
+            if (num != null) writer.WriteElementString("num", Namespaces.Transaction, this.num);
             WriteDatePosted(writer);
             WriteDateEntered(writer);
-            writer.WriteElementString("description", Namespaces.Transaction, description);
+            GnuCashXml.WriteElementString(writer, "description", Namespaces.Transaction, description);
+            if (this.kvps != null) GnuCashXml.WriteSlots(writer, this.kvps, "slots", Namespaces.Transaction, false);
             writer.WriteStartElement("splits", Namespaces.Transaction);
             foreach (Split split in splits) split.WriteXml(writer);
             writer.WriteEndElement(); // </splits>
@@ -125,25 +127,24 @@ namespace Loominate.Engine
 
         private void WriteDatePosted(XmlWriter writer)
         {
-            writer.WriteStartElement("date-posted", Namespaces.Transaction);
-            writer.WriteElementString("date", Namespaces.Timestamp, FormatDateTime(datePosted));
-            writer.WriteEndElement();
+            GnuCashXml.WriteDate(writer, "date-posted", Namespaces.Transaction,
+                datePosted);
         }
 
         private static DateTime ReadDatePosted(XmlReader reader)
         {
-            reader.ReadStartElement("date-posted", Namespaces.Transaction);
-            DateTime posted = DateTime.Parse(reader.ReadElementString("date", Namespaces.Timestamp));
-            reader.ReadEndElement();
-            return posted;
+            return (DateTime) GnuCashXml.ReadDate(reader, "date-posted", Namespaces.Transaction);
         }
 
 
         private void WriteDateEntered(XmlWriter writer)
         {
-            writer.WriteStartElement("date-entered", Namespaces.Transaction);
-            writer.WriteElementString("date", 
+            string localName = "date-entered";
+            string ns = Namespaces.Transaction;
+            writer.WriteStartElement(localName, ns);
+            writer.WriteElementString("date",
                 Namespaces.Timestamp, FormatDateTime(dateEntered.First));
+            if (dateEntered.Second != null) writer.WriteElementString("ns", Namespaces.Timestamp, dateEntered.Second.ToString());
             writer.WriteEndElement();
         }
 

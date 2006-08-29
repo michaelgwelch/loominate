@@ -41,6 +41,7 @@ namespace Loominate.Engine
         AccountType type;
         string typeString;
         int commodityScu;
+        string code;
         Commodity commodity;
         Guid parent;
 
@@ -54,6 +55,7 @@ namespace Loominate.Engine
             this.typeString = type;
             this.commodity = commodity;
             this.commodityScu = commodityScu;
+            this.code = code;
             this.description = description;
             this.parent = parent;
             this.kvps = kvps;
@@ -172,6 +174,7 @@ namespace Loominate.Engine
             writer.WriteElementString("type", Namespaces.Account, this.typeString);
             GnuCashXml.WriteCommodityId(writer, "commodity", Namespaces.Account, this.commodity);
             writer.WriteElementString("commodity-scu", Namespaces.Account, this.commodityScu.ToString());
+            if (code != null) writer.WriteElementString("code", Namespaces.Account, this.code);
             if (description != null) writer.WriteElementString("description", Namespaces.Account, this.description);
             if (kvps != null) GnuCashXml.WriteSlots(writer, this.kvps, "slots", Namespaces.Account, false);
             //if (IsPlaceholder)
