@@ -97,21 +97,25 @@ namespace Loominate.Engine
 
         internal static int ReadCountData(XmlReader reader, CountDataType type)
         {
-            int result = ReadCountDataOptional(reader, type);
-            if (result == -1)
+            int? result = ReadCountDataOptional(reader, type);
+            if (result == null)
                 throw new XmlException("Expected to find count-data");
-            return result;
+            return (int) result;
         }
 
         internal static void WriteCountData(XmlWriter writer,
 
-            string ns, CountDataType type, int value)
+            string ns, CountDataType type, int? value)
         {
-            writer.WriteStartElement(countDataElementName, ns);
-            writer.WriteAttributeString("type", Namespaces.CountData,
-                countDataTypeToString[type]);
-            writer.WriteValue(value.ToString());
-            writer.WriteEndElement();
+
+            if (value != null)
+            {
+                writer.WriteStartElement(countDataElementName, ns);
+                writer.WriteAttributeString("type", Namespaces.CountData,
+                    countDataTypeToString[type]);
+                writer.WriteValue(value.ToString());
+                writer.WriteEndElement(); 
+            }
         }
 
 
@@ -177,17 +181,18 @@ namespace Loominate.Engine
         /// <param name="reader"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal static int ReadCountDataOptional(XmlReader reader, CountDataType type)
+        internal static int? ReadCountDataOptional(XmlReader reader, CountDataType type)
         {
             reader.MoveToContent();
             // if this isn't a count-data element then return -1, it's possible this
             // was an optional instance of this element. Let the caller sort it out.
 
-            if (!reader.IsStartElement(countDataElementName, Namespaces.GnuCash)) return -1;
+            if (!reader.IsStartElement(countDataElementName, Namespaces.GnuCash)) 
+                return null;
 
 
 
-            // if count-data type is incorrect then return -1, it's possible this
+            // if count-data type is incorrect then return null, it's possible this
 
             // was an optional instance of this element. Let the caller sort it out.
 
@@ -195,7 +200,7 @@ namespace Loominate.Engine
 
             string actualType = reader.GetAttribute("type", Namespaces.CountData);
 
-            if (expectedType != actualType) return -1;
+            if (expectedType != actualType) return null;
 
 
 
@@ -398,7 +403,30 @@ namespace Loominate.Engine
             writer.WriteEndElement();
         }
 
+        internal static void WriteDate(XmlWriter writer, string localName,
+            string ns, DateTime value)
+        {
+            writer.WriteStartElement(localName, ns);
+            writer.WriteElementString("date",
+                Namespaces.Timestamp, FormatDateTime(value));
+            writer.WriteEndElement();
+        }
 
+        private static string FormatDateTime(DateTime dt)
+        {
+            System.Text.StringBuilder bldr = new System.Text.StringBuilder();
+            bldr.Append(dt.ToString("yyyy-MM-dd HH:mm:ss zzz"));
+            bldr.Replace(":", "", 20, 4);
+            return bldr.ToString();
+        }
+
+        internal static void WriteElementString(XmlWriter writer,
+            string localName, string ns, string value)
+        {
+            writer.WriteStartElement(localName, ns);
+            writer.WriteString(value);
+            writer.WriteEndElement();
+        }
 
     }
 
