@@ -141,6 +141,13 @@ namespace Loominate.Engine
             GnuCashXml.WriteIdElement(writer, NameSpace.Split, accountId, "account");
             writer.WriteEndElement(); // </split>
         }
+
+        /// <summary>
+        /// Creates an instance of <see cref="Split"/> from the data
+        /// at the current location in reader.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
         internal static Split ReadXml(XmlGnuCashReader reader)
         {
             reader.ReadStartElement(ElementName, NameSpace.Transaction);

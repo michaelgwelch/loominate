@@ -201,40 +201,39 @@ namespace Loominate.Engine
             if (reader.GetAttribute("version") != Version) throw new XmlException("Expected Account to be version " + Version);
             reader.Read(); // start element
 
-            string name = reader.ReadElementString("name", NameSpace.Account);
-            Guid id = reader.ReadIdElement(NameSpace.Account);
-            string type = reader.ReadElementString("type", NameSpace.Account);
-
-            // Read the commodity identifier information
-            Commodity c = GnuCashXml.GetCommodity(reader, Commodity.ElementName, NameSpace.Account, commodities);
-
-            string commodityscu = reader.ReadElementString("commodity-scu", NameSpace.Account);
-            string code = GnuCashXml.ReadOptionalElementString(reader, "code", NameSpace.Account);
-            string nonstandardscu = GnuCashXml.ReadOptionalElementString(reader, "non-standard-scu", NameSpace.Account);
-            string description = GnuCashXml.ReadOptionalElementString(reader, "description", NameSpace.Account);
-
-            Slots slots = null;
-            if (reader.IsStartElement("slots", NameSpace.Account))
+            using (DefaultNameSpace.Set(NameSpace.Account))
             {
-                slots = GnuCashXml.ReadSlots(reader, NameSpace.Account, "slots");
+                string name = reader.ReadString("name");
+                Guid id = reader.ReadIdElement();
+                string type = reader.ReadString("type");
+
+                // Read the commodity identifier information
+                string commodityId = reader.ReadCommodityId(Commodity.ElementName);
+                string commodityscu = reader.ReadString("commodity-scu");
+                string code = reader.ReadOptionalString("code");
+                string nonstandardscu = reader.ReadOptionalString("non-standard-scu");
+                string description = reader.ReadOptionalString("description");
+
+                Slots slots = reader.ReadOptionalSlots("slots"); ;
+
+                Guid parent = new Guid();
+                if (reader.AtElement("parent"))
+                {
+                    parent = reader.ReadIdElement("parent");
+                }
+
+                List<Lot> lots = new List<Lot>();
+                if (reader.AtElement("lots"))
+                {
+                    throw new Exception("haven't implemented lots in Account parsing yet");
+                }
+
+                reader.ReadEndElement();
+
+                Commodity c = commodities[commodityId];
+                return new Account(name, id, type, c, int.Parse(commodityscu), code,
+                    description, slots, parent);
             }
-
-            Guid parent = new Guid();
-            if (reader.IsStartElement("parent", NameSpace.Account))
-            {
-                parent = GnuCashXml.ReadIdElement(reader, NameSpace.Account, "parent");
-            }
-
-            List<Lot> lots = new List<Lot>();
-            if (reader.IsStartElement("lots", NameSpace.Account))
-            {
-                throw new Exception("haven't implemented lots in Account parsing yet");
-            }
-
-            reader.ReadEndElement();
-
-            return new Account(name, id, type, c, int.Parse(commodityscu), code, 
-                description, slots, parent);
         }
 
 

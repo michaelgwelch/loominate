@@ -95,13 +95,13 @@ namespace Loominate.Engine
 
         }
 
-        internal static int ReadCountData(XmlReader reader, CountDataType type)
-        {
-            int? result = ReadOptionalCountData(reader, type);
-            if (result == null)
-                throw new XmlException("Expected to find count-data");
-            return (int) result;
-        }
+        //internal static int ReadCountData(XmlReader reader, CountDataType type)
+        //{
+        //    int? result = ReadOptionalCountData(reader, type);
+        //    if (result == null)
+        //        throw new XmlException("Expected to find count-data");
+        //    return (int) result;
+        //}
 
         internal static void WriteCountData(XmlWriter writer,
 
@@ -174,59 +174,6 @@ namespace Loominate.Engine
 
 
 
-        /// <summary>
-        /// Reads a count data element and returns the integer value. Returns -1 if the element is not found,
-        /// because count data is sometimes optional.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        internal static int? ReadOptionalCountData(XmlReader reader, CountDataType type)
-        {
-            reader.MoveToContent();
-            // if this isn't a count-data element then return -1, it's possible this
-            // was an optional instance of this element. Let the caller sort it out.
-
-            if (!reader.IsStartElement(countDataElementName, NameSpace.GnuCash)) 
-                return null;
-
-
-
-            // if count-data type is incorrect then return null, it's possible this
-
-            // was an optional instance of this element. Let the caller sort it out.
-
-            string expectedType = countDataTypeToString[type];
-
-            string actualType = reader.GetAttribute("type", NameSpace.CountData);
-
-            if (expectedType != actualType) return null;
-
-
-
-            string val = reader.ReadElementString(countDataElementName, NameSpace.GnuCash);
-
-            return int.Parse(val);
-
-        }
-
-
-        internal static Guid ReadIdElement(XmlReader reader, string ns, string localName)
-        {
-            string idString = reader.ReadElementString(localName, ns);
-            return new Guid(idString);
-        }
-
-        /// <summary>
-        /// Helper method to read id elements. These always have the same structure but a different namespace,
-        /// so the namespace must be specified.
-        /// </summary>
-        /// <param name="ns">The namespace of the expected id element</param>
-        /// <returns></returns>
-        internal static Guid ReadIdElement(XmlReader reader, string ns)
-        {
-            return ReadIdElement(reader, ns, "id");
-        }
 
 
 
@@ -260,19 +207,6 @@ namespace Loominate.Engine
 
 
 
-        internal static DateTime? ReadDate(XmlReader reader, string localName, string ns)
-        {
-            if (reader.IsStartElement(localName, ns))
-            {
-                reader.Read();
-                DateTime date = DateTime.Parse(reader.ReadElementString("date", NameSpace.Timestamp));
-                reader.ReadEndElement();
-                return date;
-            }
-
-            return null;
-        }
-
         internal static void WriteSlots(XmlWriter writer,
             Slots slots, string localName, string ns, bool isFrame)
         {
@@ -296,7 +230,8 @@ namespace Loominate.Engine
                 {
                     writer.WriteStartElement("value", NameSpace.Slot);
                     writer.WriteAttributeString("type", type);
-                    writer.WriteString(value.Second.ToString());
+                    if (value.Second.ToString() == String.Empty) writer.WriteRaw(String.Empty); // forces a start and end element to be written
+                    else writer.WriteString(value.Second.ToString());
                     writer.WriteEndElement(); // </value>
                 }
                 writer.WriteEndElement(); // </slot>
@@ -306,77 +241,10 @@ namespace Loominate.Engine
             writer.WriteEndElement();
         }
 
-        internal static Slots
-            ReadSlots(XmlReader reader, string ns, string localName)
-        {
-
-            Slots slots = new Slots();
-
-            reader.MoveToContent();
-            bool isEmpty = reader.IsEmptyElement;
-            reader.ReadStartElement(localName, ns);
-            while (reader.IsStartElement("slot"))
-            {
-                reader.Read();
-                string key = reader.ReadElementString("key", NameSpace.Slot);
-
-                reader.MoveToContent();
-                string type = reader.GetAttribute("type");
-                object value;
-                if (type == "frame") // recursively call ourselves
-                {
-                    value = ReadSlots(reader, NameSpace.Slot, "value");
-                }
-                else
-                {
-                    value = reader.ReadElementString("value", NameSpace.Slot);
-                }
-                slots[key] = new Pair<string, object>(type, value);
-                reader.ReadEndElement();
-            }
-
-            if (!isEmpty) reader.ReadEndElement();
-            return slots;
-
-        }
 
 
-        internal static string ReadOptionalElementString(XmlReader reader, string localName, string ns)
-        {
-            if (reader.IsStartElement(localName, ns)) return reader.ReadElementString();
-            return null;
-        }
+ 
 
-
-
-        /// <summary>
-
-        /// Reads commodity id information from reader, and then uses that to select the appropriate
-
-        /// commodity from commodities.
-
-        /// </summary>
-
-        /// <param name="reader"></param>
-
-        /// <param name="ns">The namespace that the commodity element is part of.</param>
-
-        /// <param name="commodities"></param>
-
-        /// <param name="localName">"currency" or "commodity" depending on the parent element. You must specify the correct one.</param>
-
-        /// <returns></returns>
-
-        internal static Commodity GetCommodity(XmlReader reader, string localName, string ns, Dictionary<string, Commodity> commodities)
-        {
-            reader.ReadStartElement(localName, ns);
-            string commodityns = reader.ReadElementString("space", NameSpace.Commodity);
-            string commodityid = reader.ReadElementString("id", NameSpace.Commodity);
-            string uniqueId = Commodity.CreateUniqueName(commodityns, commodityid);
-            Commodity c = commodities[uniqueId];
-            reader.ReadEndElement();
-            return c;
-        }
 
 
 
@@ -409,7 +277,8 @@ namespace Loominate.Engine
             string localName, string ns, string value)
         {
             writer.WriteStartElement(localName, ns);
-            writer.WriteString(value);
+            if (value == String.Empty) writer.WriteRaw(String.Empty); // Forces a start and end element to be written.
+            else writer.WriteString(value);
             writer.WriteEndElement();
         }
 
