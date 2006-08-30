@@ -28,7 +28,7 @@ namespace Loominate.Engine
 
     public class GnuCashFile
     {
-        private const string ElementName = "gnc-v2";
+        public const string ElementName = "gnc-v2";
 
         private Book[] books;
 
@@ -39,20 +39,14 @@ namespace Loominate.Engine
 
         public void WriteXmlStream(Stream stream)
         {
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true;
-            settings.Encoding = System.Text.Encoding.UTF8;
-            settings.NewLineChars = "\n";
-            XmlWriter writer = XmlWriter.Create(stream, settings);
+            XmlGnuCashWriter writer = XmlGnuCashWriter.Create(stream);
 
-            writer.WriteStartElement(ElementName);
-            GnuCashXml.WriteNamespaces(writer);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Book, books.Length);
+            writer.Start();
+
+            writer.WriteCountData(CountDataType.Book, books.Length);
             this.books[0].WriteXml(writer);
 
-            writer.WriteEndElement();
-            writer.Flush();
+            writer.End();
 
         }
 

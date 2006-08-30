@@ -132,6 +132,11 @@ namespace Loominate.Engine
             return Book.ReadXml(this);
         }
 
+        public Split ReadSplit()
+        {
+            return Split.ReadXml(this);
+        }
+
         #endregion
 
 
@@ -141,13 +146,11 @@ namespace Loominate.Engine
 
         public Guid ReadIdElement()
         {
-            DefaultNameSpace.AssertSet();
             return ReadIdElement(DefaultNameSpace.Current);
         }
 
         public Guid ReadIdElement(string localName)
         {
-            DefaultNameSpace.AssertSet();
             return ReadIdElement(localName, DefaultNameSpace.Current);
         }
 
@@ -206,14 +209,17 @@ namespace Loominate.Engine
 
         public Slots ReadOptionalSlots(string localName, NameSpace ns)
         {
-            MoveToContent();
-            if (IsStartElement(LocalName, ns)) return ReadSlots(localName, ns);
+            if (IsStartElement(localName, ns)) return ReadSlots(localName, ns);
             else return null;
+        }
+
+        public Slots ReadOptionalSlots(string localName)
+        {
+            return ReadOptionalSlots(localName, DefaultNameSpace.Current);
         }
 
         public string ReadString(string localName)
         {
-            DefaultNameSpace.AssertSet();
             return ReadElementString(localName, DefaultNameSpace.Current);
         }
 
@@ -225,7 +231,6 @@ namespace Loominate.Engine
 
         public string ReadOptionalString(string localName)
         {
-            DefaultNameSpace.AssertSet();
             return ReadOptionalString(localName, DefaultNameSpace.Current);
         }
 
@@ -266,10 +271,35 @@ namespace Loominate.Engine
 
         public DateTime? ReadOptionalDate(string localName)
         {
-            DefaultNameSpace.AssertSet();
             return ReadOptionalDate(localName, DefaultNameSpace.Current);
         }
 
+        public DateTime ReadDate(string localName)
+        {
+            DateTime? date = ReadOptionalDate(localName);
+            if (date == null)
+            {
+                throw new XmlException(
+                    String.Format("Expected date element {0}", localName),
+                    null, base.LineNumber, base.LinePosition);
+            }
+            return (DateTime)date;
+        }
+
+        public bool AtElement(string localName)
+        {
+            return IsStartElement(localName, DefaultNameSpace.Current);
+        }
+
+        public string ReadCommodityId(string localName)
+        {
+            ReadStartElement(localName, DefaultNameSpace.Current);
+            string commodityns = ReadElementString("space", NameSpace.Commodity);
+            string commodityid = ReadElementString("id", NameSpace.Commodity);
+            string uniqueId = Commodity.CreateUniqueName(commodityns, commodityid);
+            ReadEndElement();
+            return uniqueId;
+        }
         #endregion
     }
 }

@@ -172,33 +172,26 @@ namespace Loominate.Engine
 
         internal static Commodity ReadXml(XmlGnuCashReader reader)
         {
-            reader.MoveToContent();
-
             if (!reader.IsStartElement(ElementName, NameSpace.GnuCash)) throw new XmlException("Expected commodity");
             if (reader.GetAttribute("version") != version) throw new XmlException("Expected commodity to be at version " + version);
 
             reader.ReadStartElement(ElementName, NameSpace.GnuCash);
-            
-            string ns = reader.ReadElementString("space", NameSpace.Commodity);
-            string id = reader.ReadElementString("id", NameSpace.Commodity);
-            string name = reader.ReadElementString("name", NameSpace.Commodity);
-            string xcode = GnuCashXml.ReadOptionalElementString(reader, "xcode", NameSpace.Commodity);
-            string fraction = reader.ReadElementString("fraction", NameSpace.Commodity);
-            string get_quotes = GnuCashXml.ReadOptionalElementString(reader, "get_quotes", NameSpace.Commodity);
-            string quote_source = GnuCashXml.ReadOptionalElementString(reader, "quote_source", NameSpace.Commodity);
-            string quote_tz = GnuCashXml.ReadOptionalElementString(reader, "quote_tz", NameSpace.Commodity);
 
-            /*
-             *   <cmdty:get_quotes/>
-  <cmdty:quote_source>currency</cmdty:quote_source>
-  <cmdty:quote_tz/>*/
-            
+            using (DefaultNameSpace.Set(NameSpace.Commodity))
+            {
+                string ns = reader.ReadString("space");
+                string id = reader.ReadString("id");
+                string name = reader.ReadString("name");
+                string xcode = reader.ReadOptionalString("xcode");
+                string fraction = reader.ReadString("fraction");
+                string get_quotes = reader.ReadOptionalString("get_quotes");
+                string quote_source = reader.ReadOptionalString("quote_source");
+                string quote_tz = reader.ReadOptionalString("quote_tz");
 
+                reader.ReadEndElement(); //</commodity>
 
-            reader.ReadEndElement();
-
-            return new Commodity(name, ns, id, xcode, int.Parse(fraction), get_quotes, quote_source, quote_tz);
-
+                return new Commodity(name, ns, id, xcode, int.Parse(fraction), get_quotes, quote_source, quote_tz);
+            }
 
         }
 

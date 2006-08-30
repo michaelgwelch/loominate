@@ -26,7 +26,8 @@ namespace Loominate.Engine
     using System.IO;
     using System.Text;
     using System.Xml;
-    using Spaces = Loominate.Engine.Namespaces;
+
+    using Spaces = Loominate.Engine.NameSpace;
 
     internal class XmlGnuCashWriter : XmlTextWriter
     {
@@ -86,11 +87,20 @@ namespace Loominate.Engine
                 out countDataTypeToString);
 
         }
-        public XmlGnuCashWriter(Stream stream) 
-            : base(stream, new UTF8Encoding(false))
+
+        private XmlGnuCashWriter(TextWriter writer) 
+            : base(writer)
         {
             this.Formatting = Formatting.Indented;
         }
+
+        public static new XmlGnuCashWriter Create(Stream stream)
+        {
+            TextWriter writer = new StreamWriter(stream, Encoding.UTF8);
+            writer.NewLine = "\n";
+            return new XmlGnuCashWriter(writer);
+        }
+
 
         public void Start()
         {
@@ -158,10 +168,10 @@ namespace Loominate.Engine
         /// <param name="ns">The namespace used to qualify this instance of the count-data.</param>
         /// <param name="type">The type of this count-data, defined by the <see cref="CountDataType"/> enumeration.</param>
         /// <param name="value">The count to use as the value of the element.</param>
-        public void WriteCountData(string ns, 
+        public void WriteCountData(
             CountDataType type, int value)
         {
-            WriteStartElement(countDataElementName, ns);
+            WriteStartElement(countDataElementName, NameSpace.GnuCash);
             WriteAttributeString("type", Spaces.CountData,
                 countDataTypeToString[type]);
             WriteValue(value.ToString());
@@ -197,5 +207,19 @@ namespace Loominate.Engine
             WriteElementString(localName, Spaces.Commodity, value);
         }
 
+        internal void WriteIdElement(string localName, NameSpace ns, Guid id)
+        {
+            WriteStartElement(localName, ns);
+            WriteStartAttribute("type");
+            WriteValue("guid");
+            WriteEndAttribute();
+            WriteValue(id.ToString("N"));
+            WriteEndElement();
+        }
+
+        internal void WriteIdElement(NameSpace ns, Guid id)
+        {
+            WriteIdElement("id", ns, id);
+        }
     }
 }

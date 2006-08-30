@@ -80,36 +80,39 @@ namespace Loominate.Engine
             this.entrs = numOfEntries;
         }
 
-        public void WriteXml(XmlWriter writer)
+        internal void WriteXml(XmlGnuCashWriter writer)
         {
-            writer.WriteStartElement(ElementName, NameSpace.GnuCash);
-            writer.WriteAttributeString("version", "", VersionXml);
-            GnuCashXml.WriteIdElement(writer, NameSpace.Book, this.id);
-            GnuCashXml.WriteSlots(writer, slots, "slots", NameSpace.Book, false);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Commodity, comms);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Account, accts);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Transaction, trans);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.ScheduledTransaction, strans);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Budget, budgts);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Customer, custs);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Employee, emps);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.BillTerm, terms);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Invoice, invcs);
-            GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
-                CountDataType.Entry, entrs);
-            foreach (KeyValuePair<string, Commodity> kvp in commodities) kvp.Value.WriteXml(writer);
-            foreach (Account account in accounts) account.WriteXml(writer);
-            foreach (Transaction transaction in transactions) transaction.WriteXml(writer);
-            writer.WriteEndElement();
+            using (DefaultNameSpace.Set(NameSpace.GnuCash))
+            {
+                writer.WriteStartElement(ElementName, NameSpace.GnuCash);
+                writer.WriteAttributeString("version", "", VersionXml);
+                writer.WriteIdElement(NameSpace.Book, this.id);
+                GnuCashXml.WriteSlots(writer, slots, "slots", NameSpace.Book, false);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.Commodity, comms);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.Account, accts);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.Transaction, trans);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.ScheduledTransaction, strans);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.Budget, budgts);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.Customer, custs);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.Employee, emps);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.BillTerm, terms);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.Invoice, invcs);
+                GnuCashXml.WriteCountData(writer, NameSpace.GnuCash,
+                    CountDataType.Entry, entrs);
+                foreach (KeyValuePair<string, Commodity> kvp in commodities) kvp.Value.WriteXml(writer);
+                foreach (Account account in accounts) account.WriteXml(writer);
+                foreach (Transaction transaction in transactions) transaction.WriteXml(writer);
+                writer.WriteEndElement();
+            }
         }
 
         internal static Book ReadXml(XmlGnuCashReader reader)
@@ -120,40 +123,43 @@ namespace Loominate.Engine
             if (reader.GetAttribute("version") != VersionXml)
                 throw new XmlException("Expected book element to be at version " + VersionXml);
 
-            reader.ReadStartElement(ElementName, NameSpace.GnuCash);
+            reader.Read();
 
-            Guid id = reader.ReadIdElement(NameSpace.Book);
-            Slots slots = reader.ReadOptionalSlots("slots", NameSpace.Book);
+            using (DefaultNameSpace.Set(NameSpace.Book))
+            {
+
+                Guid id = reader.ReadIdElement();
+                Slots slots = reader.ReadOptionalSlots("slots");
 
 
-            // Note: All of the following except numOfAccounts and numOfTransactions is required.
-            // Notice the use of ReadCountData for them instead of ReadCountDataOptional.
-            int? numOfCommodities = reader.ReadOptionalCountData(CountDataType.Commodity);
-            int numOfAccounts = reader.ReadCountData(CountDataType.Account);
-            int numOfTransactions = reader.ReadCountData(CountDataType.Transaction);
-            int? numOfScheduledTrans = reader.ReadOptionalCountData(CountDataType.ScheduledTransaction);
-            int? numOfBudgets = reader.ReadOptionalCountData(CountDataType.Budget);
-            int? numOfCustomers = reader.ReadOptionalCountData(CountDataType.Customer);
-            int? numOfEmployees = reader.ReadOptionalCountData(CountDataType.Employee);
-            int? numOfBillTerms = reader.ReadOptionalCountData(CountDataType.BillTerm);
-            int? numOfInvoices = reader.ReadOptionalCountData(CountDataType.Invoice);
-            int? numOfEntries = reader.ReadOptionalCountData(CountDataType.Entry);
+                // Note: All of the following except numOfAccounts and numOfTransactions is required.
+                // Notice the use of ReadCountData for them instead of ReadCountDataOptional.
+                int? numOfCommodities = reader.ReadOptionalCountData(CountDataType.Commodity);
+                int numOfAccounts = reader.ReadCountData(CountDataType.Account);
+                int numOfTransactions = reader.ReadCountData(CountDataType.Transaction);
+                int? numOfScheduledTrans = reader.ReadOptionalCountData(CountDataType.ScheduledTransaction);
+                int? numOfBudgets = reader.ReadOptionalCountData(CountDataType.Budget);
+                int? numOfCustomers = reader.ReadOptionalCountData(CountDataType.Customer);
+                int? numOfEmployees = reader.ReadOptionalCountData(CountDataType.Employee);
+                int? numOfBillTerms = reader.ReadOptionalCountData(CountDataType.BillTerm);
+                int? numOfInvoices = reader.ReadOptionalCountData(CountDataType.Invoice);
+                int? numOfEntries = reader.ReadOptionalCountData(CountDataType.Entry);
 
-            CommodityDictionary commodities = new CommodityDictionary();
-            ReadCommodities(reader, commodities);
+                CommodityDictionary commodities = new CommodityDictionary();
+                ReadCommodities(reader, commodities);
 
-            AccountList accounts = new AccountList(numOfAccounts);
-            ReadAccounts(reader, accounts, commodities);
+                AccountList accounts = new AccountList(numOfAccounts);
+                ReadAccounts(reader, accounts, commodities);
 
-            TransactionList transactions = new TransactionList(numOfTransactions);
-            ReadTransactions(reader, transactions, commodities);
+                TransactionList transactions = new TransactionList(numOfTransactions);
+                ReadTransactions(reader, transactions, commodities);
 
-            reader.ReadEndElement();
-            return new Book(id, slots, commodities, accounts, transactions,
-                numOfCommodities, numOfAccounts, numOfTransactions, numOfScheduledTrans,
-                numOfBudgets, numOfCustomers, numOfEmployees, numOfBillTerms,
-                numOfInvoices, numOfEntries);
-
+                reader.ReadEndElement();
+                return new Book(id, slots, commodities, accounts, transactions,
+                    numOfCommodities, numOfAccounts, numOfTransactions, numOfScheduledTrans,
+                    numOfBudgets, numOfCustomers, numOfEmployees, numOfBillTerms,
+                    numOfInvoices, numOfEntries);
+            }
 
         }
 

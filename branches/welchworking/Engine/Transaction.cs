@@ -43,7 +43,7 @@ namespace Loominate.Engine
         SplitList splits;
 
         public Transaction(Guid id, Commodity commodity,
-             string num, DateTime posted, Pair<DateTime, int?> entered, 
+             string num, DateTime posted, Pair<DateTime, int?> entered,
                  string description, Slots kvps,
                  SplitList splits)
         {
@@ -98,30 +98,31 @@ namespace Loominate.Engine
 
             reader.Read(); // reads start element
 
-            Guid id = GnuCashXml.ReadIdElement(reader, NameSpace.Transaction);
-            Commodity c = GnuCashXml.GetCommodity(reader, "currency", NameSpace.Transaction, commodities);
-            string num = GnuCashXml.ReadOptionalElementString(reader, "num", NameSpace.Transaction);
-
-            DateTime posted = ReadDatePosted(reader);
-            Pair<DateTime, int?> entered = ReadDateEntered(reader);
-            string description = reader.ReadElementString("description", NameSpace.Transaction);
-
-            Slots kvps = null;
-            if (reader.IsStartElement("slots", NameSpace.Transaction))
+            using (DefaultNameSpace.Set(NameSpace.Transaction))
             {
-                kvps = GnuCashXml.ReadSlots(reader, NameSpace.Transaction, "slots");
-            }
+                Guid id             = reader.ReadIdElement();
+                string commodityId  = reader.ReadCommodityId("currency");
+                string num          = reader.ReadOptionalString("num");
 
-            SplitList splits = new SplitList();
-            reader.ReadStartElement("splits", NameSpace.Transaction);
-            while (reader.IsStartElement(Split.ElementName, NameSpace.Transaction))
-            {
-                splits.Add(Split.ReadXml(reader));
-            }
-            reader.ReadEndElement(); // </splits>
-            reader.ReadEndElement(); // </transaction>
+                DateTime posted     = reader.ReadDate("date-posted");
+                Pair<DateTime, int?> entered = ReadDateEntered(reader);
+                string description  = reader.ReadString("description");
 
-            return new Transaction(id, c, num, posted, entered, description, kvps, splits);
+                Slots kvps          = reader.ReadOptionalSlots("slots");
+
+                SplitList splits = new SplitList();
+                reader.ReadStartElement("splits", NameSpace.Transaction);
+                while (reader.AtElement(Split.ElementName))
+                {
+                    splits.Add(reader.ReadSplit());
+                }
+                reader.ReadEndElement(); // </splits>
+                reader.ReadEndElement(); // </transaction>
+
+
+                Commodity c = commodities[commodityId];
+                return new Transaction(id, c, num, posted, entered, description, kvps, splits);
+            }
         }
 
 
@@ -129,11 +130,6 @@ namespace Loominate.Engine
         {
             GnuCashXml.WriteDate(writer, "date-posted", NameSpace.Transaction,
                 datePosted);
-        }
-
-        private static DateTime ReadDatePosted(XmlReader reader)
-        {
-            return (DateTime) GnuCashXml.ReadDate(reader, "date-posted", NameSpace.Transaction);
         }
 
 
@@ -148,14 +144,18 @@ namespace Loominate.Engine
             writer.WriteEndElement();
         }
 
-        private static Pair<DateTime, int?> ReadDateEntered(XmlReader reader)
+        private static Pair<DateTime, int?> ReadDateEntered(XmlGnuCashReader reader)
         {
             reader.ReadStartElement("date-entered", NameSpace.Transaction);
-            DateTime entered = DateTime.Parse(reader.ReadElementString("date", NameSpace.Timestamp));
-            string nsString = GnuCashXml.ReadOptionalElementString(reader, "ns", NameSpace.Timestamp);
-            int? ns = (nsString == null) ? (int?)null : int.Parse(nsString);
-            reader.ReadEndElement();
-            return new Pair<DateTime, int?>(entered, ns);
+            using (DefaultNameSpace.Set(NameSpace.Timestamp))
+            {
+                DateTime entered = DateTime.Parse(reader.ReadString("date"));
+                string nsString = reader.ReadOptionalString("ns");
+
+                int? ns = (nsString == null) ? (int?)null : int.Parse(nsString);
+                reader.ReadEndElement();
+                return new Pair<DateTime, int?>(entered, ns);
+            }
         }
 
         private static string FormatDateTime(DateTime dt)
