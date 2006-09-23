@@ -35,12 +35,12 @@ namespace Loominate.Engine
 
         Guid id;
         Commodity commodity;
-        string num;
-        DateTime datePosted;
+        public string num;
+        public DateTime datePosted;
         Pair<DateTime, int?> dateEntered;
-        string description;
+        public string description;
         Slots kvps;
-        SplitList splits;
+        public SplitList splits;
 
         public Transaction(Guid id, Commodity commodity,
              string num, DateTime posted, Pair<DateTime, int?> entered,
